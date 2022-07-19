@@ -1,5 +1,3 @@
-// Minh Phan
-
 /**
  * Map: Contain map configurations and keep track of the tiles in the map
  */
