@@ -6,24 +6,28 @@ class Player{
         this.x = x;
         this.y = y;
         this.health = 100;
-        this.fire = fire();                 
-        this.move = move();
+        this.angle = 0;
+        this.force = 20;
+    }
+    fire(){
+        
+    }
+    changeAngle(){
+
     }
 }
 
-//Initialize players
-function initPlayer(map){
-    let x, y = initPostition(map);          //Find the x,y position of player on the generated map object
-    const Player1 = new Player(x,y);
-    const Player2 = new Player(WIDTH-x,y);
-    displayPlayer(Player1);                 //displayPlayer on the map, at position x,y
-    displayPlayer(Player2);
+//Initialize player positions
+function initPosition(map){
+    let x = Math.floor(Math.random()*(WIDTH/2 + 1))     //Only randomize on half of the width
+    let y = map[x];
+    return [x,y];
 }
 
-//Initialize player positions
-function initPosition(map);
-
-//DisplayPlayer on map
-function displayPlayer(Player){
-    
+//Create players
+function createPlayer(map){
+    let [x, y] = initPostition(map);
+    const Player1 = new Player(x,y);
+    const Player2 = new Player(WIDTH-x,y);
+    //Display players on map
 }
