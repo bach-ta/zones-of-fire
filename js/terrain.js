@@ -35,6 +35,37 @@ export default class Terrain {
                 // TODO: Read a .txt file and construct a map   
                 break;
         }
+
+        // TEMPORARY FIXED COLOR MAP
+        let data32 = new Uint32Array(this.width * this.height);
+        let colorMap = [];
+
+        for(let x = 0; x < width; x++ ){
+            colorMap[x] = [];
+            for(var y = 0; y < height; y++ ){
+                if (y < 2*height/3) {
+                    colorMap[x][y] = "#00FFFF";
+                } else {
+                    colorMap[x][y] = "#3F301D";
+                }
+            }
+          }
+
+        // Flatten array
+        for(let x, y = 0, p = 0; y < this.height; y++){
+            for(x = 0; x < this.width; x++) {
+                data32[p++] = this.str2uint32(colorMap[x][y]);
+            }
+        }
+
+        // Construct ImageData object
+        this.imageData = new ImageData(new Uint8ClampedArray(data32.buffer), this.width, this.height);
+
+        // for (let i = 0; i < this.imageData.data.length; i++) {
+        //     let row = Math.round(i/this.width);
+        //     let col = Math.round(i%this.width);
+        //     this.imageData.data[i] = this.tiles[row][col];
+        // }
     }
 
     /**
@@ -45,18 +76,9 @@ export default class Terrain {
         if (!canvas.getContext) {
             return;
         }
-        
-        for (let i = 0; i < this.height; i++) {
-            for (let j = 0; j < this.width; j++) {
-                if (this.tiles[i][j] === 1) {
-                    context.fillStyle = '#3F301D';
-                    context.fillRect(j,i,1,1);
-                } else {
-                    context.fillStyle = 'aqua';
-                    context.fillRect(j,i,1,1);
-                }
-            }
-        }
+
+        // Draw terrain
+        context.putImageData(this.imageData, 0, 0);
 
         // Set line stroke and line width
         context.strokeStyle = 'black';
@@ -70,5 +92,11 @@ export default class Terrain {
         context.lineTo(this.width, 0);
         context.lineTo(0, 0);
         context.stroke();
+    }
+
+    /* Helper function */
+    str2uint32(str) {
+        var n = ("0x" + str.substr(1))|0;
+        return 0xff000000 | (n << 16) | (n & 0xff00) | (n >>> 16)
     }
 }

@@ -25,21 +25,16 @@ export default class Game {
     // this.bullet = null;
 
     this.hasFlyingBullet = true;
-    this.bullet = new Bullet(150, 150, 45, 1, 5, "red");
-
-    // Draw terrain
-    this.terrain.drawTerrain();
-
+    this.bullet = new Bullet(150, 150, 45, 10, 5, "red");
   }
 
   /**
    * Update the state of the game
    */
-  update = () => {
-    // if (this.hasFlyingBullet) {
-    //   this.handleBullet();
-    // }
-                            
+  update() {
+    if (this.hasFlyingBullet) {
+      this.handleBullet();
+    }
     if (this.players[this.turn].anglePressed === true){
       // this.players[this.turn].angle += 10;
       // console.log(this.players[this.turn].angle);
@@ -50,7 +45,10 @@ export default class Game {
   /**
    * Draw the game in the current frame
    */
-  draw = () => {
+  draw() {
+    // Draw terrain
+    this.terrain.drawTerrain();
+
     // Draw players
     for (let i = 0; i < this.players.length; i++) {
       this.players[i].drawPlayer();
@@ -65,7 +63,7 @@ export default class Game {
   /**
    * Game loop
    */
-  loop = (timestamp) => {
+  loop(timestamp) {
       this.update();
       this.draw();
       window.requestAnimationFrame(this.loop);
@@ -75,7 +73,7 @@ export default class Game {
   //==============================================//
   /* Helper Functions */
 
-  handleBullet = () => {
+  handleBullet() {
     this.bullet.x += this.bullet.velocity * Math.sin(this.bullet.angle);
     this.bullet.y += this.bullet.velocity * Math.cos(this.bullet.angle);
     
@@ -86,7 +84,7 @@ export default class Game {
     }
   }
 
-  nextTurn = () => {
+  nextTurn() {
     this.turn = (this.turn + 1) % this.numPlayers;
   }
 
@@ -95,7 +93,7 @@ export default class Game {
   }
 
   // Create players
-  createPlayers = (terrain) => {
+  createPlayers(terrain) {
     const [x1, y1, x2, y2] = initPositions(this.terrain);
     const player1 = new Player(x1, y1, "red");
     const player2 = new Player(x2, y2, "blue");
