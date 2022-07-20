@@ -21,14 +21,29 @@ export default class Player{
         context.arc(this.x, this.y, RADIUS, 0, Math.PI*2);
         context.fill();
     }
-
     /*
     fire() { 
     }
-    changeAngle() {
-    }
     move() {
     }*/
+    changeAngle() {
+        
+        let leftPressed = false;
+
+        document.body.addEventListener('keydown', keyPressed);
+        document.body.addEventListener('keyup', keyReleased)
+
+        function keyPressed(event){
+            if (event.keyCode === 37){                  //If pressed left arrow
+                leftPressed = true;
+            }
+        }
+        function keyReleased(event){
+            if (event.keyCode === 37){                  //If released left arrow
+                leftPressed = false;
+            }
+        }
+    }
 }
 
 // Initialize player positions
