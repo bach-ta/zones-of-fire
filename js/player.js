@@ -1,11 +1,12 @@
-// Minh Em
 import { WIDTH, RADIUS } from './constants.js';
+import { canvas, context } from './game.js'
 
 // Player Objects
 export default class Player{
-    constructor(x, y){
+    constructor(x, y, color){
         this.x = x;
         this.y = y;
+        this.color = color;
         this.health = 100;
         this.angle = 0;
         this.force = 20;
@@ -13,12 +14,20 @@ export default class Player{
 
     //Add player methods
 
+    // Display player
+    displayPlayer = () => {
+        context.fillStyle = this.color;
+        context.beginPath();
+        context.arc(this.x, this.y, RADIUS, 0, Math.PI*2);
+        context.fill();
+    }
+
     /*
-    fire(){ 
+    fire() { 
     }
-    changeAngle(){
+    changeAngle() {
     }
-    move(){
+    move() {
     }*/
 }
 

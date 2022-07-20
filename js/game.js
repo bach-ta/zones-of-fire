@@ -12,23 +12,15 @@ export default class Game {
     this.players = [];
   }
 
-  // Display player on terrain
-  displayPlayer = (player, color) => {
-    context.fillStyle = color;
-    context.beginPath();
-    context.arc(player.x, player.y, RADIUS, 0, Math.PI*2);
-    context.fill();
-  }
-
   // Create players
   createPlayers = (terrain) => {
     const [x1, y1, x2, y2] = initPositions(terrain);
-    const player1 = new Player(x1,y1);
-    const player2 = new Player(x2,y2);
+    const player1 = new Player(x1, y1, "red");
+    const player2 = new Player(x2, y2, "blue");
     
     // Display players on terrain
-    this.displayPlayer(player1, "red");
-    this.displayPlayer(player2, "blue");
+    player1.displayPlayer();
+    player2.displayPlayer();
 
     return [player1, player2];
   }
@@ -44,7 +36,6 @@ export default class Game {
   initGame = () => {
     const terrain = new Terrain("flat", WIDTH, HEIGHT);
     terrain.displayTerrain();
-
     this.players = this.createPlayers(terrain);
   }
 }
