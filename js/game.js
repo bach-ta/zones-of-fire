@@ -36,8 +36,14 @@ export default class Game {
    * Update the state of the game
    */
   update = () => {
-    if (this.hasFlyingBullet) {
-      this.handleBullet();
+    // if (this.hasFlyingBullet) {
+    //   this.handleBullet();
+    // }
+                            
+    if (this.players[this.turn].anglePressed === true){
+      // this.players[this.turn].angle += 10;
+      // console.log(this.players[this.turn].angle);
+      console.log("ok");
     }
   }
 
@@ -51,9 +57,9 @@ export default class Game {
     }
 
     // Draw bullet if exists
-    if (this.hasFlyingBullet) {
-      this.bullet.drawBullet();
-    }
+    // if (this.hasFlyingBullet) {
+    //   this.bullet.drawBullet();
+    // }
   }
 
   /**

@@ -9,6 +9,7 @@ export default class Player{
         this.color = color;
         this.health = 100;
         this.angle = 0;
+        this.anglePressed = false;
         this.force = 20;
     }
 
@@ -27,20 +28,18 @@ export default class Player{
     move() {
     }*/
     changeAngle() {
-        
-        let leftPressed = false;
 
         document.body.addEventListener('keydown', keyPressed);
         document.body.addEventListener('keyup', keyReleased)
 
         function keyPressed(event){
             if (event.keyCode === 37){                  //If pressed left arrow
-                leftPressed = true;
+                this.anglePressed = true;
             }
         }
         function keyReleased(event){
             if (event.keyCode === 37){                  //If released left arrow
-                leftPressed = false;
+                this.anglePressed = false;
             }
         }
     }
