@@ -1,6 +1,6 @@
 import Player, { initPositions } from './player.js';
 import Terrain from './terrain.js';
-import { RADIUS } from './constants.js';
+import { WIDTH, HEIGHT, RADIUS } from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -42,7 +42,7 @@ export default class Game {
   }
 
   initGame = () => {
-    const terrain = new Terrain("flat", 500, 400);
+    const terrain = new Terrain("flat", WIDTH, HEIGHT);
     terrain.displayTerrain();
 
     this.players = this.createPlayers(terrain);
