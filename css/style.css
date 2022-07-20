@@ -1,9 +1,21 @@
 *{
     box-sizing:border-box;
 }
+
 body{
     overflow: hidden;       /*Hide scrollbars when moving characters*/
 }
+
+#game-title {
+    text-align: center;
+}
+
 #canvas{
-    border: 4px solid blueviolet
+    border: 4px solid blueviolet;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
 }
