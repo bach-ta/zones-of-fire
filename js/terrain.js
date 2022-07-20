@@ -40,7 +40,7 @@ export default class Terrain {
     /**
      * Display
      */
-    displayTerrain() {
+    drawTerrain() {
         // Draw on the canvas
         if (!canvas.getContext) {
             return;

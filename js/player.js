@@ -1,5 +1,5 @@
 import { WIDTH, RADIUS } from './constants.js';
-import { canvas, context } from './game.js'
+import { canvas, context } from './game.js';
 
 // Player Objects
 export default class Player{
@@ -14,8 +14,8 @@ export default class Player{
 
     //Add player methods
 
-    // Display player
-    displayPlayer = () => {
+    // Draw player
+    drawPlayer = () => {
         context.fillStyle = this.color;
         context.beginPath();
         context.arc(this.x, this.y, RADIUS, 0, Math.PI*2);
