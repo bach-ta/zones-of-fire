@@ -23,7 +23,7 @@ export default class Player{
 }
 
 // Initialize player positions
-export function initPositions(terrain) {
+export const initPositions = (terrain) => {
     let x1 = 100; //Math.floor(Math.random()*(WIDTH/2 + 1))     //Randomize on half the width
     let y1 = terrain.height/3*2 - RADIUS;
     let x2 = WIDTH-x1;

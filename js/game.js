@@ -13,7 +13,7 @@ export default class Game {
   }
 
   // Display player on terrain
-  displayPlayer(player, color) {
+  displayPlayer = (player, color) => {
     context.fillStyle = color;
     context.beginPath();
     context.arc(player.x, player.y, RADIUS, 0, Math.PI*2);
@@ -41,7 +41,7 @@ export default class Game {
     alert(`Player ${player} wins!`);
   }
 
-  initGame() {
+  initGame = () => {
     const terrain = new Terrain("flat", 500, 400);
     terrain.displayTerrain();
 
