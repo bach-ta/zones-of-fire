@@ -10,7 +10,7 @@ export default class Bullet {
         this.color = color;
     }
 
-    drawBullet = () => {
+    drawBullet() {
         context.fillStyle = this.color;
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, Math.PI*2);

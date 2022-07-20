@@ -95,7 +95,7 @@ export default class Terrain {
     }
 
     /* Helper function */
-    str2uint32 = (str) => {
+    str2uint32(str) {
         var n = ("0x" + str.substr(1))|0;
         return 0xff000000 | (n << 16) | (n & 0xff00) | (n >>> 16)
     }
