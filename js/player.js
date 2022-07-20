@@ -37,7 +37,7 @@ function initPositions(terrain){
     let x1 = 100;                                           //Temporary x and y
     let y1 = 250;
     let x2 = WIDTH-x1;
-    let y2 = 250;
+    let y2 = 200;
     return [x1, y1, x2, y2];
 }
 
