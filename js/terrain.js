@@ -1,7 +1,9 @@
 /**
  * Terrain: Contain map configurations and keep track of the tiles in the map
  */
-class Terrain {
+import { canvas, context } from './game.js'
+
+export default class Terrain {
     /**
      * Construct initial terrain
      */
@@ -39,43 +41,34 @@ class Terrain {
      * Display
      */
     displayTerrain() {
-        console.log(this.height);
-        console.log(this.width);
-        console.log(this.tiles);
-
         // Draw on the canvas
-        const canvas = document.querySelector('#canvas');
         if (!canvas.getContext) {
             return;
         }
-        const ctx = canvas.getContext('2d');
         
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
                 if (this.tiles[i][j] === 1) {
-                    ctx.fillStyle = '#3F301D';
-                    ctx.fillRect(j,i,1,1);
+                    context.fillStyle = '#3F301D';
+                    context.fillRect(j,i,1,1);
                 } else {
-                    ctx.fillStyle = 'aqua';
-                    ctx.fillRect(j,i,1,1);
+                    context.fillStyle = 'aqua';
+                    context.fillRect(j,i,1,1);
                 }
             }
         }
 
         // Set line stroke and line width
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 1;
+        context.strokeStyle = 'black';
+        context.lineWidth = 1;
 
         // Draw borderline (Later migrate this to game instead)
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, this.height);
-        ctx.lineTo(this.width, this.height);
-        ctx.lineTo(this.width, 0);
-        ctx.lineTo(0, 0);
-        ctx.stroke();
+        context.beginPath();
+        context.moveTo(0, 0);
+        context.lineTo(0, this.height);
+        context.lineTo(this.width, this.height);
+        context.lineTo(this.width, 0);
+        context.lineTo(0, 0);
+        context.stroke();
     }
 }
-
-let d = new Terrain("flat", 200, 100);
-d.displayTerrain();
