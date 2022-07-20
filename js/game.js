@@ -25,11 +25,7 @@ export default class Game {
     // this.bullet = null;
 
     this.hasFlyingBullet = true;
-    this.bullet = new Bullet(150, 150, 45, 1, 5, "red");
-
-    // Draw terrain
-    this.terrain.drawTerrain();
-
+    this.bullet = new Bullet(150, 150, 45, 10, 5, "red");
   }
 
   /**
@@ -45,6 +41,9 @@ export default class Game {
    * Draw the game in the current frame
    */
   draw = () => {
+    // Draw terrain
+    this.terrain.drawTerrain();
+
     // Draw players
     for (let i = 0; i < this.players.length; i++) {
       this.players[i].drawPlayer();
