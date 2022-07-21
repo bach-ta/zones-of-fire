@@ -1,4 +1,5 @@
 import Player, { initPositions } from './player.js';
+import Arrow from './arrow.js';
 import Terrain from './terrain.js';
 import Bullet from './bullet.js';
 import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS} from './constants.js';
@@ -53,9 +54,11 @@ export default class Game {
     // Draw terrain
     this.terrain.drawTerrain();
 
-    // Draw players
+    // Draw players and arrows
     for (let i = 0; i < this.players.length; i++) {
       this.players[i].drawPlayer();
+      let arrow = new Arrow(this.players[i].color);
+      arrow.drawArrow(this.players[i]);
     }
 
     // Draw bullet if exists
@@ -120,11 +123,14 @@ export default class Game {
 
   handleBullet = () => {
     //Generate bullet only once each time space is pressed
-    if (this.bulletGenerationCount === 0){  
-      this.bullet = new Bullet(this.players[this.turn].x, this.players[this.turn].y, this.players[this.turn].angle, this.players[this.turn].force, BULLET_RADIUS, "yellow");
+    if (this.bulletGenerationCount === 0){ 
+      let bulletStartX = this.players[this.turn].x + PLAYER_RADIUS*Math.cos(this.players[this.turn].angle);
+      let bulletStartY = this.players[this.turn].y + PLAYER_RADIUS*Math.sin(this.players[this.turn].angle);
+      this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].angle, this.players[this.turn].force, BULLET_RADIUS, "yellow");
       this.bulletGenerationCount += 1;
     }
-
+    
+    //Flying bullet
     this.bullet.x += this.bullet.velocity * Math.cos(this.bullet.bulletAngle);
     this.bullet.y += this.bullet.velocity * Math.sin(this.bullet.bulletAngle);
     
@@ -150,7 +156,7 @@ export default class Game {
   createPlayers = () => {
     const [x1, y1, x2, y2] = initPositions(this.terrain);
     const player1 = new Player(x1, y1, "red");
-    const player2 = new Player(x2, y2, "blue");
+    const player2 = new Player(x2, y2, "blue", Math.PI);
     return [player1, player2];
   }
 }

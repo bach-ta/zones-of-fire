@@ -4,7 +4,7 @@ import Game, { canvas, context } from './game.js';
 // Player Objects
 export default class Player{
     
-    constructor(x, y, color){
+    constructor(x, y, color, angle = 0){
         this.color = color;
         this.health = 100;
         this.moveSpeed = PLAYER_SPEED;
@@ -14,7 +14,7 @@ export default class Player{
         this.leftPressed = false;
         this.rightPressed = false;
 
-        this.angle = 0;
+        this.angle = angle;
         this.upPressed = false;
         this.downPressed = false;
 
@@ -27,39 +27,44 @@ export default class Player{
         //Event listeners
         //
         document.addEventListener('keydown', (e) => {
-            if (e.keyCode === 32){                              //If pressed spacebar (_)
-                this.spacePressed = true;   
+            switch (e.keyCode){
+                case 32:                              //If pressed spacebar (_)
+                    this.spacePressed = true;
+                    break;   
+                case 37:                              //If pressed left arrow (<)
+                    this.leftPressed = true;   
+                    break;
+                case 38:                              //If pressed up arrow (^)
+                    this.upPressed = true;      
+                    break;
+                case 39:                              //If pressed right arrow (>)
+                    this.rightPressed = true;   
+                    break;
+                case 40:                              //If pressed down arrow (v)
+                    this.downPressed = true;      
+                    break;
             }
-            if (e.keyCode === 37){                              //If pressed left arrow (<)
-                this.leftPressed = true;   
-            }
-            if (e.keyCode === 38){                              //If pressed up arrow (^)
-                this.upPressed = true;      
-            }
-            if (e.keyCode === 39){                              //If pressed right arrow (>)
-                this.rightPressed = true;   
-            }
-            if (e.keyCode === 40){                              //If pressed down arrow (v)
-                this.downPressed = true;      
-            }
+            
         });
 
         document.addEventListener('keyup', (e) => {
-            if (e.keyCode === 32){                              //If released spacebar (_)
-                this.spacePressed = false;
-                this.spaceReleased = true;
-            }
-            if (e.keyCode === 37){                              //If released left arrow (<)
-                this.leftPressed = false;
-            }
-            if (e.keyCode === 38){                              //If released up arrow (^)
-                this.upPressed = false;
-            }
-            if (e.keyCode === 39){                              //If released right arrow (>)
-                this.rightPressed = false;
-            }
-            if (e.keyCode === 40){                              //If released down arrow (v)
-                this.downPressed = false;
+            switch (e.keyCode){
+                case 32:                              //If released spacebar (_)
+                    this.spacePressed = false;
+                    this.spaceReleased = true;
+                    break;
+                case 37:                              //If released left arrow (<)
+                    this.leftPressed = false;
+                    break;
+                case 38:                              //If released up arrow (^)
+                    this.upPressed = false;
+                    break;
+                case 39:                              //If released right arrow (>)
+                    this.rightPressed = false;
+                    break;
+                case 40:                              //If released down arrow (v)
+                    this.downPressed = false;
+                    break;
             }
         });
     }
