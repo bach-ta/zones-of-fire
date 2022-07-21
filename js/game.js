@@ -38,11 +38,20 @@ export default class Game {
       this.handleBullet();
     }
 
-    // Check if player changed angles
-    if (this.players[this.turn].leftPressed === true || this.players[this.turn].rightPressed === true){
+    // Check if player pressed changing angle keys
+    if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed){
       this.players[this.turn].changeAngle();
     }
 
+    // Check if player pressed/released shooting key
+    if (this.players[this.turn].spacePressed){
+      this.players[this.turn].changeForce();
+    }
+    if (this.players[this.turn].spaceReleased){
+      this.players[this.turn].fire();
+      this.players[this.turn].spaceReleased = false;
+      this.players[this.turn].force = 0;
+    }
   }
 
   /**
@@ -70,7 +79,7 @@ export default class Game {
   loop = () => {
     this.update();
     this.draw();
-    console.log("loop");
+    //console.log("loop");
     window.requestAnimationFrame(this.loop);
   }
 

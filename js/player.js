@@ -8,10 +8,14 @@ export default class Player{
         this.y = y;
         this.color = color;
         this.health = 100;
+
         this.angle = 0;
         this.leftPressed = false;
         this.rightPressed = false;
-        this.force = 20;
+
+        this.force = 0;
+        this.spacePressed = false;
+        this.spaceReleased = false;
     }
 
     //Add player methods
@@ -32,14 +36,23 @@ export default class Player{
         if (this.rightPressed){
             this.angle -= 1;
         }
-        //console.log(this.angle);
+        console.log(`Angle: ${this.angle}`);
     }
     
-    /*
-    fire() { 
+    //Niệm chiêu
+    changeForce = () => {
+        if (this.spacePressed){
+            this.force += 1;
+        }
+        console.log(`Force: ${this.force}`);
     }
-    move() {
-    }*/
+    
+    fire() {
+        console.log("fire");
+    }
+
+    // move() {
+    // }
 }
 
 // Initialize player positions
