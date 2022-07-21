@@ -1,17 +1,21 @@
-import { WIDTH, RADIUS } from './constants.js';
+import { WIDTH, PLAYER_RADIUS } from './constants.js';
 import { canvas, context } from './game.js';
 
 // Player Objects
 export default class Player{
     constructor(x, y, color){
-        this.x = x;
-        this.y = y;
         this.color = color;
         this.health = 100;
-
-        this.angle = 0;
+        this.moveSpeed = 5;
+        
+        this.x = x;
+        this.y = y;
         this.leftPressed = false;
         this.rightPressed = false;
+
+        this.angle = 0;
+        this.upPressed = false;
+        this.downPressed = false;
 
         this.force = 0;
         this.spacePressed = false;
@@ -24,16 +28,27 @@ export default class Player{
     drawPlayer = () => {
         context.fillStyle = this.color;
         context.beginPath();
-        context.arc(this.x, this.y, RADIUS, 0, Math.PI*2);
+        context.arc(this.x, this.y, PLAYER_RADIUS, 0, Math.PI*2);
         context.fill();
     }
     
-    //Change shooting angle
-    changeAngle = () => { 
+    //Move Player 
+    //!!!!!!!!!!!!!!Not yet able to move with terrain
+    move = () => {
         if (this.leftPressed){
-            this.angle += 1;
+            this.x -= this.moveSpeed;
         }
         if (this.rightPressed){
+            this.x += this.moveSpeed;
+        }
+    }
+
+    //Change angle
+    changeAngle = () => { 
+        if (this.upPressed){
+            this.angle += 1;
+        }
+        if (this.downPressed){
             this.angle -= 1;
         }
         console.log(`Angle: ${this.angle}`);
@@ -47,20 +62,19 @@ export default class Player{
         console.log(`Force: ${this.force}`);
     }
     
-    fire() {
+    //Fire bullet
+    fire = () => {
         console.log("fire");
     }
 
-    // move() {
-    // }
 }
 
 // Initialize player positions
 export const initPositions = (terrain) => {
-    let x1 = 100; //Math.floor(Math.random()*(WIDTH/2 + 1))     //Randomize on half the width
-    let y1 = terrain.height/3*2 - RADIUS;
+    let x1 = 100;
+    let y1 = terrain.height/3*2 - PLAYER_RADIUS;
     let x2 = WIDTH-x1;
-    let y2 = terrain.height/3*2 - RADIUS;
+    let y2 = terrain.height/3*2 - PLAYER_RADIUS;
 
     return [x1, y1, x2, y2];
 }

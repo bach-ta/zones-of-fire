@@ -1,7 +1,7 @@
 import Player, { initPositions } from './player.js';
 import Terrain from './terrain.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, RADIUS } from './constants.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS } from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -32,26 +32,15 @@ export default class Game {
    * Update the state of the game
    */
   update = () => {
-    
     // Check if there is a bullet
-    if (this.hasFlyingBullet) {
-      this.handleBullet();
-    }
-
-    // Check if player pressed changing angle keys
-    if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed){
-      this.players[this.turn].changeAngle();
-    }
-
-    // Check if player pressed/released shooting key
-    if (this.players[this.turn].spacePressed){
-      this.players[this.turn].changeForce();
-    }
-    if (this.players[this.turn].spaceReleased){
-      this.players[this.turn].fire();
-      this.players[this.turn].spaceReleased = false;
-      this.players[this.turn].force = 0;
-    }
+    this.checkBullet();
+    // Check if user pressed changing angle keys
+    this.checkAngle();
+    // Check if user pressed/released shooting key
+    this.checkShoot();
+    //Check if user moved
+    this.checkMove();
+    
   }
 
   /**
@@ -70,7 +59,6 @@ export default class Game {
     if (this.hasFlyingBullet) {
       this.bullet.drawBullet();
     }
-
   }
 
   /**
@@ -81,6 +69,46 @@ export default class Game {
     this.draw();
     //console.log("loop");
     window.requestAnimationFrame(this.loop);
+  }
+
+  //********************************** */
+  // update game Functions
+  //
+
+  checkBullet = () => {
+    if (this.hasFlyingBullet) {
+      this.handleBullet();
+    }
+  }
+
+  checkAngle = () => {
+    if (this.players[this.turn].upPressed || this.players[this.turn].downPressed){
+      this.players[this.turn].changeAngle();
+    }
+  }
+
+  checkShoot = () => {
+    if (this.players[this.turn].spacePressed){
+      this.players[this.turn].changeForce();
+    }
+    if (this.players[this.turn].spaceReleased){
+      this.players[this.turn].fire();
+      this.players[this.turn].spaceReleased = false;
+      this.players[this.turn].force = 0;
+    }
+  }
+
+  checkMove(){
+    if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed){
+      this.players[this.turn].move();
+      //Check Boundary
+      if (this.players[this.turn].x < PLAYER_RADIUS){
+        this.players[this.turn].x = PLAYER_RADIUS;
+      }
+      if (this.players[this.turn].x > WIDTH - PLAYER_RADIUS){
+        this.players[this.turn].x = WIDTH - PLAYER_RADIUS
+      }
+    }
   }
 
   //==============================================//
