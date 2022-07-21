@@ -9,7 +9,8 @@ export default class Player{
         this.color = color;
         this.health = 100;
         this.angle = 0;
-        this.anglePressed = false;
+        this.leftPressed = false;
+        this.rightPressed = false;
         this.force = 20;
     }
 
@@ -22,25 +23,23 @@ export default class Player{
         context.arc(this.x, this.y, RADIUS, 0, Math.PI*2);
         context.fill();
     }
+    
+    //Change shooting angle
+    changeAngle = () => { 
+        if (this.leftPressed){
+            this.angle += 1;
+        }
+        if (this.rightPressed){
+            this.angle -= 1;
+        }
+        //console.log(this.angle);
+    }
+    
     /*
     fire() { 
     }
     move() {
     }*/
-    changeAngle = () => { 
-
-        document.body.addEventListener('keydown', event => {
-            if (event.keyCode === 37){                  //If pressed left arrow
-            //this.anglePressed = true;                 //"this" refers to body !!!!!!!!!!!!!!!!!!!!!!
-            console.log("pressed")                      //Too many times for 1 press (min 500)
-            }
-        });
-        document.body.addEventListener('keyup', event => {
-            if (event.keyCode === 37){                  //If released left arrow
-                //this.anglePressed = false;
-            }
-        });
-    }
 }
 
 // Initialize player positions

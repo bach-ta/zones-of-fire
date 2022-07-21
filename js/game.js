@@ -38,13 +38,9 @@ export default class Game {
       this.handleBullet();
     }
 
-    // Check if player pressed the keys to change angles
-    this.players[this.turn].changeAngle();
-    
-    if (this.players[this.turn].anglePressed === true){
-      // this.players[this.turn].angle += 1;
-      // console.log(this.players[this.turn].angle);
-      console.log("ok");
+    // Check if player changed angles
+    if (this.players[this.turn].leftPressed === true || this.players[this.turn].rightPressed === true){
+      this.players[this.turn].changeAngle();
     }
 
   }
