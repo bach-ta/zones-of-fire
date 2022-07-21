@@ -1,11 +1,11 @@
 import { canvas, context } from './game.js';
 
 export default class Bullet {
-    constructor(x, y, angle, velocity, radius, color) {
+    constructor(x, y, bulletAngle, velocity, radius, color) {
         //Bullet position
         this.x = x;
         this.y = y;
-        this.angle = angle;
+        this.bulletAngle = bulletAngle;
         this.velocity = velocity;
         this.radius = radius;
         this.color = color;

@@ -1,16 +1,16 @@
 import Player, { initPositions } from './player.js';
 import Terrain from './terrain.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS } from './constants.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS} from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
 
 export default class Game {
-  /**
-   * Construct the intial states of the game
-   * @param {} numPlayers 
-   */
+  /**********************************************************************
+  // Construct the intial states of the game
+  // @param {} numPlayers 
+  */
   constructor(numPlayers = 2) {
     // Game config
     this.numPlayers = numPlayers;
@@ -22,30 +22,33 @@ export default class Game {
     // Game states
     this.turn = 0;
     this.hasFlyingBullet = false;
+    this.bulletGenerationCount = 0;
     this.bullet = null;
-    //test bullet
-    this.hasFlyingBullet = true;
-    this.bullet = new Bullet(150, 150, 45, 5, 5, "red");
+    // test bullet
+    // this.hasFlyingBullet = true;
+    // this.bullet = new Bullet(150, 150, 45, 5, 5, "red");
   }
 
-  /**
-   * Update the state of the game
-   */
+  //**********************************************************************
+  // Update the state of the game
+  //
   update = () => {
-    // Check if there is a bullet
-    this.checkBullet();
-    // Check if user pressed changing angle keys
-    this.checkAngle();
-    // Check if user pressed/released shooting key
-    this.checkShoot();
     //Check if user moved
     this.checkMove();
-    
+
+    // Check if user pressed changing angle keys
+    this.checkAngle();
+
+    // Check if user pressed/released shooting key
+    this.checkShoot();
+
+    // Check if there is a bullet
+    this.checkBullet();
   }
 
-  /**
-   * Draw the game in the current frame
-   */
+  //**********************************************************************
+  // Draw the game in the current frame
+  //
   draw = () => {
     // Draw terrain
     this.terrain.drawTerrain();
@@ -61,9 +64,9 @@ export default class Game {
     }
   }
 
-  /**
-   * Game loop
-   */
+  //**********************************************************************
+  // Game Loop
+  //
   loop = () => {
     this.update();
     this.draw();
@@ -71,10 +74,9 @@ export default class Game {
     window.requestAnimationFrame(this.loop);
   }
 
-  //********************************** */
-  // update game Functions
+  //**********************************************************************
+  // Update Functions
   //
-
   checkBullet = () => {
     if (this.hasFlyingBullet) {
       this.handleBullet();
@@ -91,10 +93,11 @@ export default class Game {
     if (this.players[this.turn].spacePressed){
       this.players[this.turn].changeForce();
     }
+    
     if (this.players[this.turn].spaceReleased){
-      this.players[this.turn].fire();
+      this.hasFlyingBullet = true;
       this.players[this.turn].spaceReleased = false;
-      this.players[this.turn].force = 0;
+      this.players[this.turn].fire();
     }
   }
 
@@ -106,23 +109,32 @@ export default class Game {
         this.players[this.turn].x = PLAYER_RADIUS;
       }
       if (this.players[this.turn].x > WIDTH - PLAYER_RADIUS){
-        this.players[this.turn].x = WIDTH - PLAYER_RADIUS
+        this.players[this.turn].x = WIDTH - PLAYER_RADIUS;
       }
     }
   }
 
-  //==============================================//
-  //==============================================//
-  /* Helper Functions */
+  //**********************************************************************
+  // Helper Functions
+  //
 
   handleBullet = () => {
-    this.bullet.x += this.bullet.velocity * Math.sin(this.bullet.angle);
-    this.bullet.y += this.bullet.velocity * Math.cos(this.bullet.angle);
+    //Generate bullet only once each time space is pressed
+    if (this.bulletGenerationCount === 0){  
+      this.bullet = new Bullet(this.players[this.turn].x, this.players[this.turn].y, this.players[this.turn].angle, this.players[this.turn].force, BULLET_RADIUS, "yellow");
+      this.bulletGenerationCount += 1;
+    }
+
+    this.bullet.x += this.bullet.velocity * Math.cos(this.bullet.bulletAngle);
+    this.bullet.y += this.bullet.velocity * Math.sin(this.bullet.bulletAngle);
     
-    // Clear if bullet touch object
-    if (this.bullet.x > WIDTH && this.bullet.y > HEIGHT) {
+    // Reset bullet and player force if bullet touch object or bullet goes out of canvas
+    if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT || this.bullet.y < 0) {
+      console.log("Bullet out. You can shoot now")
       this.hasFlyingBullet = false;
       this.bullet = null;
+      this.bulletGenerationCount = 0
+      this.players[this.turn].force = 0;
     }
   }
 
@@ -142,3 +154,6 @@ export default class Game {
     return [player1, player2];
   }
 }
+
+
+

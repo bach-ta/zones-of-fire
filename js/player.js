@@ -1,5 +1,5 @@
-import { WIDTH, PLAYER_RADIUS } from './constants.js';
-import { canvas, context } from './game.js';
+import { HEIGHT, WIDTH, PLAYER_RADIUS, PLAYER_SPEED} from './constants.js';
+import Game, { canvas, context } from './game.js';
 
 // Player Objects
 export default class Player{
@@ -7,7 +7,7 @@ export default class Player{
     constructor(x, y, color){
         this.color = color;
         this.health = 100;
-        this.moveSpeed = 5;
+        this.moveSpeed = PLAYER_SPEED;
         
         this.x = x;
         this.y = y;
@@ -22,7 +22,7 @@ export default class Player{
         this.spacePressed = false;
         this.spaceReleased = false;
 
-        
+
         //**********************************************************************
         //Event listeners
         //
@@ -87,13 +87,13 @@ export default class Player{
         }
     }
 
-    //Change angle
+    //Change angle (reverse sign since x,y axis are upside down)
     changeAngle = () => { 
         if (this.upPressed){
-            this.angle += 1;
+            this.angle -= Math.PI/180;
         }
         if (this.downPressed){
-            this.angle -= 1;
+            this.angle += Math.PI/180;
         }
         console.log(`Angle: ${this.angle}`);
     }
