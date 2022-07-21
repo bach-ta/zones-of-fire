@@ -16,7 +16,7 @@ export default class Player{
     //Add player methods
 
     // Draw player
-    drawPlayer() {
+    drawPlayer = () => {
         context.fillStyle = this.color;
         context.beginPath();
         context.arc(this.x, this.y, RADIUS, 0, Math.PI*2);
@@ -27,26 +27,24 @@ export default class Player{
     }
     move() {
     }*/
-    changeAngle() {
+    changeAngle = () => { 
 
-        document.body.addEventListener('keydown', keyPressed);
-        document.body.addEventListener('keyup', keyReleased)
-
-        function keyPressed(event){
+        document.body.addEventListener('keydown', event => {
             if (event.keyCode === 37){                  //If pressed left arrow
-                this.anglePressed = true;
+            //this.anglePressed = true;                 //"this" refers to body !!!!!!!!!!!!!!!!!!!!!!
+            console.log("pressed")                      //Too many times for 1 press (min 500)
             }
-        }
-        function keyReleased(event){
+        });
+        document.body.addEventListener('keyup', event => {
             if (event.keyCode === 37){                  //If released left arrow
-                this.anglePressed = false;
+                //this.anglePressed = false;
             }
-        }
+        });
     }
 }
 
 // Initialize player positions
-export function initPositions(terrain) {
+export const initPositions = (terrain) => {
     let x1 = 100; //Math.floor(Math.random()*(WIDTH/2 + 1))     //Randomize on half the width
     let y1 = terrain.height/3*2 - RADIUS;
     let x2 = WIDTH-x1;

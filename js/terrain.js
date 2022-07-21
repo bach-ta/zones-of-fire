@@ -49,7 +49,7 @@ export default class Terrain {
                     colorMap[x][y] = "#3F301D";
                 }
             }
-          }
+        }
 
         // Flatten array
         for(let x, y = 0, p = 0; y < this.height; y++){
@@ -71,7 +71,7 @@ export default class Terrain {
     /**
      * Display
      */
-    drawTerrain() {
+    drawTerrain = () => {
         // Draw on the canvas
         if (!canvas.getContext) {
             return;
@@ -95,7 +95,7 @@ export default class Terrain {
     }
 
     /* Helper function */
-    str2uint32(str) {
+    str2uint32 = (str) => {
         var n = ("0x" + str.substr(1))|0;
         return 0xff000000 | (n << 16) | (n & 0xff00) | (n >>> 16)
     }

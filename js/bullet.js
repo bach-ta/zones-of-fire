@@ -2,6 +2,7 @@ import { canvas, context } from './game.js';
 
 export default class Bullet {
     constructor(x, y, angle, velocity, radius, color) {
+        //Bullet position
         this.x = x;
         this.y = y;
         this.angle = angle;
@@ -10,7 +11,7 @@ export default class Bullet {
         this.color = color;
     }
 
-    drawBullet() {
+    drawBullet = () => {
         context.fillStyle = this.color;
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, Math.PI*2);

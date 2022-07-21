@@ -21,31 +21,38 @@ export default class Game {
 
     // Game states
     this.turn = 0;
-    // this.hasFlyingBullet = faslse;
-    // this.bullet = null;
-
+    this.hasFlyingBullet = false;
+    this.bullet = null;
+    //test bullet
     this.hasFlyingBullet = true;
-    this.bullet = new Bullet(150, 150, 45, 10, 5, "red");
+    this.bullet = new Bullet(150, 150, 45, 5, 5, "red");
   }
 
   /**
    * Update the state of the game
    */
-  update() {
+  update = () => {
+    
+    // Check if there is a bullet
     if (this.hasFlyingBullet) {
       this.handleBullet();
     }
+
+    // Check if player pressed the keys to change angles
+    this.players[this.turn].changeAngle();
+    
     if (this.players[this.turn].anglePressed === true){
-      // this.players[this.turn].angle += 10;
+      // this.players[this.turn].angle += 1;
       // console.log(this.players[this.turn].angle);
       console.log("ok");
     }
+
   }
 
   /**
    * Draw the game in the current frame
    */
-  draw() {
+  draw = () => {
     // Draw terrain
     this.terrain.drawTerrain();
 
@@ -55,25 +62,27 @@ export default class Game {
     }
 
     // Draw bullet if exists
-    // if (this.hasFlyingBullet) {
-    //   this.bullet.drawBullet();
-    // }
+    if (this.hasFlyingBullet) {
+      this.bullet.drawBullet();
+    }
+
   }
 
   /**
    * Game loop
    */
-  loop(timestamp) {
-      this.update();
-      this.draw();
-      window.requestAnimationFrame(this.loop);
+  loop = () => {
+    this.update();
+    this.draw();
+    console.log("loop");
+    window.requestAnimationFrame(this.loop);
   }
 
   //==============================================//
   //==============================================//
   /* Helper Functions */
 
-  handleBullet() {
+  handleBullet = () => {
     this.bullet.x += this.bullet.velocity * Math.sin(this.bullet.angle);
     this.bullet.y += this.bullet.velocity * Math.cos(this.bullet.angle);
     
@@ -84,7 +93,7 @@ export default class Game {
     }
   }
 
-  nextTurn() {
+  nextTurn = () => {
     this.turn = (this.turn + 1) % this.numPlayers;
   }
 
@@ -93,7 +102,7 @@ export default class Game {
   }
 
   // Create players
-  createPlayers(terrain) {
+  createPlayers = () => {
     const [x1, y1, x2, y2] = initPositions(this.terrain);
     const player1 = new Player(x1, y1, "red");
     const player2 = new Player(x2, y2, "blue");
