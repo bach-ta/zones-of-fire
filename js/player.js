@@ -21,52 +21,6 @@ export default class Player{
         this.force = 0;
         this.spacePressed = false;
         this.spaceReleased = false;
-
-
-        //**********************************************************************
-        //Event listeners
-        //
-        document.addEventListener('keydown', (e) => {
-            switch (e.keyCode){
-                case 32:                              //If pressed spacebar (_)
-                    this.spacePressed = true;
-                    break;   
-                case 37:                              //If pressed left arrow (<)
-                    this.leftPressed = true;   
-                    break;
-                case 38:                              //If pressed up arrow (^)
-                    this.upPressed = true;      
-                    break;
-                case 39:                              //If pressed right arrow (>)
-                    this.rightPressed = true;   
-                    break;
-                case 40:                              //If pressed down arrow (v)
-                    this.downPressed = true;      
-                    break;
-            }
-            
-        });
-
-        document.addEventListener('keyup', (e) => {
-            switch (e.keyCode){
-                case 32:                              //If released spacebar (_)
-                    this.spacePressed = false;
-                    this.spaceReleased = true;
-                    break;
-                case 37:                              //If released left arrow (<)
-                    this.leftPressed = false;
-                    break;
-                case 38:                              //If released up arrow (^)
-                    this.upPressed = false;
-                    break;
-                case 39:                              //If released right arrow (>)
-                    this.rightPressed = false;
-                    break;
-                case 40:                              //If released down arrow (v)
-                    this.downPressed = false;
-                    break;
-            }
-        });
     }
 
     //**********************************************************************
@@ -105,7 +59,7 @@ export default class Player{
     
     //Niệm chiêu. Max = 100
     changeForce = () => {
-        if (this.spacePressed && this.force < 100){
+        if (this.force < 100){
             this.force += 1;
         }
         console.log(`Force: ${this.force}`);

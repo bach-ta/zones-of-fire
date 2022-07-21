@@ -134,13 +134,14 @@ export default class Game {
     this.bullet.x += this.bullet.velocity * Math.cos(this.bullet.bulletAngle);
     this.bullet.y += this.bullet.velocity * Math.sin(this.bullet.bulletAngle);
     
-    // Reset bullet and player force if bullet touch object or bullet goes out of canvas
+    //Reset bullet and player force if bullet goes out of canvas
     if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT || this.bullet.y < 0) {
       console.log("Bullet out. You can shoot now")
       this.hasFlyingBullet = false;
       this.bullet = null;
-      this.bulletGenerationCount = 0
+      this.bulletGenerationCount = 0;
       this.players[this.turn].force = 0;
+      this.nextTurn();
     }
   }
 
