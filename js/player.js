@@ -3,6 +3,7 @@ import { canvas, context } from './game.js';
 
 // Player Objects
 export default class Player{
+    
     constructor(x, y, color){
         this.color = color;
         this.health = 100;
@@ -20,9 +21,52 @@ export default class Player{
         this.force = 0;
         this.spacePressed = false;
         this.spaceReleased = false;
+
+        
+        //**********************************************************************
+        //Event listeners
+        //
+        document.addEventListener('keydown', (e) => {
+            if (e.keyCode === 32){                              //If pressed spacebar (_)
+                this.spacePressed = true;   
+            }
+            if (e.keyCode === 37){                              //If pressed left arrow (<)
+                this.leftPressed = true;   
+            }
+            if (e.keyCode === 38){                              //If pressed up arrow (^)
+                this.upPressed = true;      
+            }
+            if (e.keyCode === 39){                              //If pressed right arrow (>)
+                this.rightPressed = true;   
+            }
+            if (e.keyCode === 40){                              //If pressed down arrow (v)
+                this.downPressed = true;      
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.keyCode === 32){                              //If released spacebar (_)
+                this.spacePressed = false;
+                this.spaceReleased = true;
+            }
+            if (e.keyCode === 37){                              //If released left arrow (<)
+                this.leftPressed = false;
+            }
+            if (e.keyCode === 38){                              //If released up arrow (^)
+                this.upPressed = false;
+            }
+            if (e.keyCode === 39){                              //If released right arrow (>)
+                this.rightPressed = false;
+            }
+            if (e.keyCode === 40){                              //If released down arrow (v)
+                this.downPressed = false;
+            }
+        });
     }
 
-    //Add player methods
+    //**********************************************************************
+    //Player methods
+    //
 
     // Draw player
     drawPlayer = () => {
@@ -54,9 +98,9 @@ export default class Player{
         console.log(`Angle: ${this.angle}`);
     }
     
-    //Niệm chiêu
+    //Niệm chiêu. Max = 100
     changeForce = () => {
-        if (this.spacePressed){
+        if (this.spacePressed && this.force < 100){
             this.force += 1;
         }
         console.log(`Force: ${this.force}`);

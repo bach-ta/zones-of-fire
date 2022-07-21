@@ -98,7 +98,7 @@ export default class Game {
     }
   }
 
-  checkMove(){
+  checkMove = () => {
     if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed){
       this.players[this.turn].move();
       //Check Boundary
