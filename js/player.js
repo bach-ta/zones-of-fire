@@ -1,10 +1,10 @@
-import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED} from './constants.js';
+import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT } from './constants.js';
 import Game, { canvas, context } from './game.js';
 
 // Player Objects
 export default class Player{
     
-    constructor(x, y, color, angle = 0){
+    constructor(x, y, color, angle = 0, direction){
         this.color = color;
         this.health = 100;
         this.moveSpeed = PLAYER_SPEED;
@@ -22,6 +22,8 @@ export default class Player{
         this.force = 0;
         this.spacePressed = false;
         this.spaceReleased = false;
+
+        this.direction = direction;
     }
 
     //**********************************************************************
@@ -39,41 +41,54 @@ export default class Player{
     //Move Player 
     //!!!!!!!!!!!!!!Not yet able to move with terrain
     move = () => {
-        if (this.leftPressed && this.moveCount < MAX_MOVEMENT_ALLOWED){
-            this.x -= this.moveSpeed;
-            this.moveCount += 1;
+        if (this.changeDirection()) return;
+        if (this.moveCount < MAX_MOVEMENT_ALLOWED) {
+            if (this.leftPressed) {
+                this.x -= this.moveSpeed;
+                this.moveCount += 1;
+            } else {
+                this.x += this.moveSpeed;
+                this.moveCount += 1;
+            }
         }
-        if (this.rightPressed && this.moveCount < MAX_MOVEMENT_ALLOWED){
-            this.x += this.moveSpeed;
-            this.moveCount += 1;
+    }
+
+    changeDirection = () => {
+        let changed = false;
+        if (this.leftPressed) {
+            if (this.direction === DIRECTION_RIGHT) this.angle = Math.PI - this.angle, changed = true;
+            this.direction = DIRECTION_LEFT;
+        } else {
+            if (this.direction === DIRECTION_LEFT) this.angle = Math.PI - this.angle, changed = true;
+            this.direction = DIRECTION_RIGHT;
         }
+        return changed;
     }
 
     //Change angle (reverse sign since x,y axis are upside down)
     changeAngle = () => { 
         if (this.upPressed){
-            this.angle -= Math.PI/90;
+            this.angle += (Math.PI/90) * (2 * this.direction - 1);
         }
         if (this.downPressed){
-            this.angle += Math.PI/90;
+            this.angle -= (Math.PI/90) * (2 * this.direction - 1);
         }
-        console.log(`Angle: ${this.angle}`);
+        // console.log(`Angle: ${this.angle}`);
     }
     
     //Niệm chiêu. Max = 100
     changeForce = () => {
+        console.log("change");
         if (this.force < 100){
-            this.force += 1;
+            this.force++;
         }
-        console.log(`Force: ${this.force}`);
+        // console.log(`Force: ${this.force}`);
     }
     
     //Fire bullet
-    fire = () => {      
+    fire = () => {
         //Ban movement after firing
         this.moveCount = MAX_MOVEMENT_ALLOWED;
-
-        console.log("fire");
     }
 
 }

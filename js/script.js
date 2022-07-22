@@ -1,12 +1,10 @@
 import Game from './game.js';
 
-const game = new Game();
-game.loop();
-
 //**********************************************************************
 //Event listeners
 //
-document.addEventListener('keydown', (e) => {
+
+const handleKeyDown = (e) => {
     switch (e.keyCode){
         case 32:                              //If pressed spacebar (_)
             game.players[game.turn].spacePressed = true;
@@ -25,9 +23,9 @@ document.addEventListener('keydown', (e) => {
             break;
         }
         
-});
+}
 
-document.addEventListener('keyup', (e) => {
+const handleKeyUp = (e) => {
     switch (e.keyCode){
         case 32:                              //If released spacebar (_)
             game.players[game.turn].spacePressed = false;
@@ -46,4 +44,13 @@ document.addEventListener('keyup', (e) => {
             game.players[game.turn].downPressed = false;
             break;
         }
-});
+}
+
+export const enableEventListener = () => {
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+}
+
+enableEventListener();
+const game = new Game();
+game.loop();

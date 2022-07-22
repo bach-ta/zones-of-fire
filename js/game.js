@@ -2,7 +2,7 @@ import Player, { initPositions } from './player.js';
 import Arrow from './arrow.js';
 import Terrain from './terrain.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS} from './constants.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, DIRECTION_RIGHT, DIRECTION_LEFT } from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -74,7 +74,7 @@ export default class Game {
   loop = () => {
     this.update();
     this.draw();
-    //console.log("loop");
+    // console.log("loop");
     window.requestAnimationFrame(this.loop);
   }
 
@@ -88,18 +88,17 @@ export default class Game {
   }
 
   checkAngle = () => {
-    if (this.players[this.turn].upPressed || this.players[this.turn].downPressed){
+    if (this.players[this.turn].upPressed || this.players[this.turn].downPressed) {
       this.players[this.turn].changeAngle();
     }
   }
 
   checkShoot = () => {
-    if (this.players[this.turn].spacePressed){
+    if (this.players[this.turn].spacePressed) {
       this.players[this.turn].changeForce();
     }
     
-    if (this.players[this.turn].spaceReleased){
-      //TO DO: Disable space input
+    if (this.players[this.turn].spaceReleased) {
       this.players[this.turn].fire();
       this.hasFlyingBullet = true;
       this.players[this.turn].spaceReleased = false;
@@ -107,13 +106,13 @@ export default class Game {
   }
 
   checkMove = () => {
-    if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed){
+    if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed) {
       this.players[this.turn].move();
       //Check Boundary
-      if (this.players[this.turn].x < PLAYER_RADIUS){
+      if (this.players[this.turn].x < PLAYER_RADIUS) {
         this.players[this.turn].x = PLAYER_RADIUS;
       }
-      if (this.players[this.turn].x > WIDTH - PLAYER_RADIUS){
+      if (this.players[this.turn].x > WIDTH - PLAYER_RADIUS) {
         this.players[this.turn].x = WIDTH - PLAYER_RADIUS;
       }
     }
@@ -125,7 +124,7 @@ export default class Game {
 
   handleBullet = () => {
     //Generate bullet only once each time space is pressed
-    if (this.bulletGenerationCount === 0){ 
+    if (this.bulletGenerationCount === 0) { 
       let bulletStartX = this.players[this.turn].x + PLAYER_RADIUS*Math.cos(this.players[this.turn].angle);
       let bulletStartY = this.players[this.turn].y + PLAYER_RADIUS*Math.sin(this.players[this.turn].angle);
       this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].angle, this.players[this.turn].force, BULLET_RADIUS, "yellow");
@@ -138,16 +137,16 @@ export default class Game {
     
     //Reset bullet and player force if bullet goes out of canvas
     if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT || this.bullet.y < 0) {
-      console.log("Bullet out. You can shoot now")
-      this.hasFlyingBullet = false;
-      this.bullet = null;
-      this.bulletGenerationCount = 0;
-      this.players[this.turn].force = 0;
       this.nextTurn();
     }
   }
 
-  nextTurn = () => {
+  nextTurn = () => {// console.log("Bullet out. You can shoot now")
+    this.hasFlyingBullet = false;
+    this.bullet = null;
+    this.bulletGenerationCount = 0;
+    this.players[this.turn].force = 0;
+
     //In case player never released key --> When turn comes back, value of _Pressed still be true
     this.players[this.turn].spacePressed = false;
     this.players[this.turn].upPressed = false;
@@ -168,8 +167,8 @@ export default class Game {
   // Create players
   createPlayers = () => {
     const [x1, y1, x2, y2] = initPositions(this.terrain);
-    const player1 = new Player(x1, y1, "red");
-    const player2 = new Player(x2, y2, "blue", Math.PI);
+    const player1 = new Player(x1, y1, "red", 0, DIRECTION_RIGHT);
+    const player2 = new Player(x2, y2, "blue", Math.PI, DIRECTION_LEFT);
     return [player1, player2];
   }
 }
