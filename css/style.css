@@ -6,12 +6,16 @@ body{
     overflow: hidden;       /*Hide scrollbars when moving characters*/
 }
 
-#game-title {
+#game-title, #show-force {
     text-align: center;
 }
 
+#show-force {
+    color: black;
+}
+
 #canvas{
-    border: 4px solid blueviolet;
+    border: 4px solid grey;
     position: absolute;
     top: 0;
     bottom: 0;

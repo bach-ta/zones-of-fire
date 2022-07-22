@@ -2,7 +2,7 @@ import Player, { initPositions } from './player.js';
 import Arrow from './arrow.js';
 import Terrain from './terrain.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, DIRECTION_RIGHT, DIRECTION_LEFT } from './constants.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY } from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -23,7 +23,7 @@ export default class Game {
     // Game states
     this.turn = 0;
     this.hasFlyingBullet = false;
-    this.bulletGenerationCount = 0;
+    this.bulletFlyingTime = 0;
     this.bullet = null;
     // test bullet
     // this.hasFlyingBullet = true;
@@ -63,7 +63,6 @@ export default class Game {
 
     // Draw bullet if exists
     if (this.hasFlyingBullet) {
-      //TO DO: Disable keyboard entries
       this.bullet.drawBullet();
     }
   }
@@ -124,19 +123,19 @@ export default class Game {
 
   handleBullet = () => {
     //Generate bullet only once each time space is pressed
-    if (this.bulletGenerationCount === 0) { 
-      let bulletStartX = this.players[this.turn].x + PLAYER_RADIUS*Math.cos(this.players[this.turn].angle);
-      let bulletStartY = this.players[this.turn].y + PLAYER_RADIUS*Math.sin(this.players[this.turn].angle);
-      this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].angle, this.players[this.turn].force, BULLET_RADIUS, "yellow");
-      this.bulletGenerationCount += 1;
+    if (this.bulletFlyingTime === 0) { 
+      let bulletStartX = this.players[this.turn].x + ARROW_LENGTH*Math.cos(this.players[this.turn].angle);
+      let bulletStartY = this.players[this.turn].y + ARROW_LENGTH*Math.sin(this.players[this.turn].angle);
+      this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].angle, this.players[this.turn].force, BULLET_RADIUS, this.players[this.turn].color);
     }
     
     //Flying bullet
-    this.bullet.x += this.bullet.velocity * Math.cos(this.bullet.bulletAngle);
-    this.bullet.y += this.bullet.velocity * Math.sin(this.bullet.bulletAngle);
-    
-    //Reset bullet and player force if bullet goes out of canvas
-    if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT || this.bullet.y < 0) {
+    this.bullet.x += 1*(this.bullet.velocity * Math.cos(this.bullet.bulletAngle));
+    this.bullet.y -= (-this.bullet.velocity * Math.sin(this.bullet.bulletAngle)) - ((1/2 * GRAVITY)*(Math.pow(this.bulletFlyingTime + 1,2) - Math.pow(this.bulletFlyingTime,2)));
+    this.bulletFlyingTime += 1;
+
+    //Reset bullet and player force if bullet goes out of canvas (except for top side)
+    if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT) {
       this.nextTurn();
     }
   }
@@ -144,7 +143,7 @@ export default class Game {
   nextTurn = () => {// console.log("Bullet out. You can shoot now")
     this.hasFlyingBullet = false;
     this.bullet = null;
-    this.bulletGenerationCount = 0;
+    this.bulletFlyingTime = 0;
     this.players[this.turn].force = 0;
 
     //In case player never released key --> When turn comes back, value of _Pressed still be true

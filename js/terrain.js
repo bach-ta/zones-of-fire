@@ -44,9 +44,9 @@ export default class Terrain {
             colorMap[x] = [];
             for(var y = 0; y < height; y++ ){
                 if (y < 2*height/3) {
-                    colorMap[x][y] = "#00FFFF";
+                    colorMap[x][y] = "#000000";
                 } else {
-                    colorMap[x][y] = "#3F301D";
+                    colorMap[x][y] = "#52525C";
                 }
             }
         }

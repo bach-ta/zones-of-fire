@@ -1,4 +1,4 @@
-import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT } from './constants.js';
+import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP } from './constants.js';
 import Game, { canvas, context } from './game.js';
 
 // Player Objects
@@ -80,8 +80,9 @@ export default class Player{
     changeForce = () => {
         console.log("change");
         if (this.force < 100){
-            this.force++;
+            this.force += FORCE_STEP;
         }
+        document.querySelector('#show-force').textContent = this.force;
         // console.log(`Force: ${this.force}`);
     }
     
