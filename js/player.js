@@ -1,4 +1,4 @@
-import { HEIGHT, WIDTH, PLAYER_RADIUS, PLAYER_SPEED} from './constants.js';
+import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED} from './constants.js';
 import Game, { canvas, context } from './game.js';
 
 // Player Objects
@@ -11,6 +11,7 @@ export default class Player{
         
         this.x = x;
         this.y = y;
+        this.moveCount = 0;
         this.leftPressed = false;
         this.rightPressed = false;
 
@@ -38,21 +39,23 @@ export default class Player{
     //Move Player 
     //!!!!!!!!!!!!!!Not yet able to move with terrain
     move = () => {
-        if (this.leftPressed){
+        if (this.leftPressed && this.moveCount < MAX_MOVEMENT_ALLOWED){
             this.x -= this.moveSpeed;
+            this.moveCount += 1;
         }
-        if (this.rightPressed){
+        if (this.rightPressed && this.moveCount < MAX_MOVEMENT_ALLOWED){
             this.x += this.moveSpeed;
+            this.moveCount += 1;
         }
     }
 
     //Change angle (reverse sign since x,y axis are upside down)
     changeAngle = () => { 
         if (this.upPressed){
-            this.angle -= Math.PI/180;
+            this.angle -= Math.PI/90;
         }
         if (this.downPressed){
-            this.angle += Math.PI/180;
+            this.angle += Math.PI/90;
         }
         console.log(`Angle: ${this.angle}`);
     }
@@ -66,7 +69,10 @@ export default class Player{
     }
     
     //Fire bullet
-    fire = () => {
+    fire = () => {      
+        //Ban movement after firing
+        this.moveCount = MAX_MOVEMENT_ALLOWED;
+
         console.log("fire");
     }
 

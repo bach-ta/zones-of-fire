@@ -63,6 +63,7 @@ export default class Game {
 
     // Draw bullet if exists
     if (this.hasFlyingBullet) {
+      //TO DO: Disable keyboard entries
       this.bullet.drawBullet();
     }
   }
@@ -98,9 +99,10 @@ export default class Game {
     }
     
     if (this.players[this.turn].spaceReleased){
+      //TO DO: Disable space input
+      this.players[this.turn].fire();
       this.hasFlyingBullet = true;
       this.players[this.turn].spaceReleased = false;
-      this.players[this.turn].fire();
     }
   }
 
@@ -146,6 +148,16 @@ export default class Game {
   }
 
   nextTurn = () => {
+    //In case player never released key --> When turn comes back, value of _Pressed still be true
+    this.players[this.turn].spacePressed = false;
+    this.players[this.turn].upPressed = false;
+    this.players[this.turn].rightPressed = false;
+    this.players[this.turn].downPressed = false;
+    this.players[this.turn].leftPressed = false;
+
+    //Reset amount of movement allowed before switching turn
+    this.players[this.turn].moveCount = 0;
+    //Change turn
     this.turn = (this.turn + 1) % this.numPlayers;
   }
 
