@@ -163,30 +163,28 @@ export default class Game {
       }
       this.setTiles = tempTiles;
       this.terrain.updateImageData();
-      // this.handlePlayerFall();
+      this.handlePlayerFall();
       this.nextTurn();
       // console.log(this.terrain.tiles[roundX][roundY]);
     }
   }
 
   // Handle player fall
-  // FIXME: This functions is NOT ready for use
   handlePlayerFall = () => {
     console.log(this.players);
 
     let tempTiles = this.terrain.getTiles;
+
     for (let i = 0; i < this.players.length; i++) {
       let currentPlayer = this.players[i];
-      let roundX = Math.round(currentPlayer.getX);
-      let roundY = Math.round(currentPlayer.getY);
+      let roundX = Math.ceil(currentPlayer.getX);
+      let currentY = Math.ceil(currentPlayer.getY + PLAYER_RADIUS + 1);
 
-      if (tempTiles[roundX][roundY] == 0) {
-        for (let j = roundY; j < WIDTH; j++) {
-          if (tempTiles[roundX][j] = 1) {
-            this.players[i].setY = j;
-          }
-        }
+      while (currentY < HEIGHT && tempTiles[roundX][currentY] == 0) {
+        currentY++;
       }
+      if (currentY == HEIGHT) this.players[i].setY = 0;
+      else this.players[i].setY = currentY - PLAYER_RADIUS - 1;
     }
   }
 

@@ -14,7 +14,7 @@ export default class Terrain {
             for (let i = 0; i < width; i++) {
                 this.tiles[i] = [];
                 for(let j = 0; j < height; j++) {
-                    if (j < 2*height/3) {
+                    if (j <= 2*height/3) {
                         this.tiles[i][j] = 0;
                     } else {
                         this.tiles[i][j] = 1;
