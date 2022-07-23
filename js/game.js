@@ -26,6 +26,7 @@ export default class Game {
     this.hasFlyingBullet = false;
     this.bulletFlyingTime = 0;
     this.bullet = null;
+    this.checkHit = 0;
     this.trackBulletX = [];
     this.trackBulletY = [];
   }
@@ -144,6 +145,12 @@ export default class Game {
     }
     this.bulletFlyingTime += 1;
 
+    // Checks if bullet directly hit the OTHER player
+    if (this.checkDirectHitPlayer() && this.checkHit === 0){
+      this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
+      this.checkHit++;
+    }
+
     // Reset bullet and player force if bullet goes out of canvas (except for top side)
     if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT) {
       this.nextTurn();
@@ -157,13 +164,9 @@ export default class Game {
   // Handle if bullet had clash with terrain
   handleBulletCrashed = () => {
     let tempTiles = this.terrain.getTiles;
-    
-    let roundX = Math.round(this.bullet.x);
-    let roundY = Math.round(this.bullet.y);
-
     let clashPointX = 0;
     let clashPointY = 0;
-    
+
     // Find first clash point
     for (let i = 0; i < 100; i++) {
       let tempCeilX = Math.ceil(this.trackBulletX[i]);
@@ -189,16 +192,14 @@ export default class Game {
       }
       this.setTiles = tempTiles;
       this.terrain.updateImageData();
-      // this.handlePlayerFall();
-
-      // TODO: if bullet hits the OTHER player, decrease health of OTHER player
-      // if (checkHit){
+      
+      // Checks if bullet splash hit the OTHER player
+      if (this.checkSplashHitPlayer(clashPointX, clashPointY) && this.checkHit === 0){
         this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
-      // }
+      }
 
       this.handlePlayerFall();
       this.nextTurn();
-      // console.log(this.terrain.tiles[roundX][roundY]);
     }
   }
 
@@ -221,6 +222,22 @@ export default class Game {
     }
   }
 
+  checkDirectHitPlayer = () => {
+    let distance = Math.sqrt(Math.pow((this.players[(this.turn + 1) % this.numPlayers].x - this.bullet.x), 2) + Math.pow((this.players[(this.turn + 1) % this.numPlayers].y - this.bullet.y), 2));
+    if (distance < (PLAYER_RADIUS + BULLET_RADIUS)){
+      return true;
+    }
+    return false;
+  }
+
+  checkSplashHitPlayer = (clashPointX, clashPointY) => {
+    let distance = Math.sqrt(Math.pow((this.players[(this.turn + 1) % this.numPlayers].x - clashPointX), 2) + Math.pow((this.players[(this.turn + 1) % this.numPlayers].y - clashPointY), 2));
+    if (distance < (PLAYER_RADIUS + BULLET_RADIUS*10)){
+      return true;
+    }
+    return false;
+  }
+
   decreaseHealth = (player) => {
     player.health -= DAMAGE;
     // This player loses
@@ -235,6 +252,7 @@ export default class Game {
     this.bullet = null;
     this.bulletFlyingTime = 0;
     this.players[this.turn].force = 0;
+    this.checkHit = 0;
 
     // In case player never released key --> When turn comes back, value of _Pressed still be true
     this.players[this.turn].spacePressed = false;
