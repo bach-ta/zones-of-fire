@@ -1,4 +1,4 @@
-import { canvas, context } from './game.js';
+import { context } from './game.js';
 
 export default class Bullet {
     constructor(x, y, bulletAngle, velocity, radius, color) {

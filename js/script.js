@@ -22,7 +22,6 @@ const handleKeyDown = (e) => {
             game.players[game.turn].downPressed = true;      
             break;
         }
-        
 }
 
 const handleKeyUp = (e) => {
@@ -52,5 +51,5 @@ export const enableEventListener = () => {
 }
 
 enableEventListener();
-const game = new Game();
+let game = new Game();
 game.loop();

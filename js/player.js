@@ -1,5 +1,5 @@
 import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE } from './constants.js';
-import Game, { canvas, context } from './game.js';
+import { context } from './game.js';
 
 // Player Objects
 export default class Player{

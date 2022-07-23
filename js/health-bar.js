@@ -5,7 +5,6 @@ export default class HealthBar {
     constructor(x, y, health = MAX_HEALTH, color){
         this.x = x;
         this.y = y;
-        // this.width = HEALTH_BAR_WIDTH;
         this.height = HEALTH_BAR_HEIGHT; 
         this.width = HEALTH_BAR_WIDTH;
         this.health = health;

@@ -1,6 +1,6 @@
-/**
- * Terrain: Contain map configurations and keep track of the tiles in the map
- */
+// **********************************************************************
+// Terrain: Contain map configurations and keep track of the tiles in the map
+//
 import { canvas, context } from './game.js'
 
 export default class Terrain {
@@ -46,9 +46,7 @@ export default class Terrain {
         this.tiles = tiles;
     }
 
-    /**
-     * Display
-     */
+    // Display
     drawTerrain = () => {
         // Draw on the canvas
         if (!canvas.getContext) {
@@ -76,8 +74,9 @@ export default class Terrain {
         // Update tiles also update image data
         this.imageData = this.convertTilesToImageData(this.tiles);
     }
-
-    /* Helper function */
+    // **********************************************************************
+    // Helper functions
+    //
     convertTilesToImageData = (tiles) => {
         let data32 = new Uint32Array(this.width * this.height);
         let colorMap = [];

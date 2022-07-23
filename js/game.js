@@ -3,7 +3,7 @@ import Arrow from './arrow.js';
 import Terrain from './terrain.js';
 import HealthBar from './health-bar.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, DAMAGE, MIN_ANGLE, MAX_ANGLE, INITIAL_ANGLE } from './constants.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, DAMAGE, INITIAL_ANGLE } from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -29,9 +29,12 @@ export default class Game {
     this.checkHit = 0;
     this.trackBulletX = [];
     this.trackBulletY = [];
+
+    // End game
+    this.end = false;
   }
 
-  //**********************************************************************
+  // **********************************************************************
   // Update the state of the game
   //
   update = () => {
@@ -48,7 +51,7 @@ export default class Game {
     this.checkBullet();
   }
 
-  //**********************************************************************
+  // **********************************************************************
   // Draw the game in the current frame
   //
   draw = () => {
@@ -74,7 +77,7 @@ export default class Game {
     }
   }
 
-  //**********************************************************************
+  // **********************************************************************
   // Game Loop
   //
   loop = () => {
@@ -84,7 +87,7 @@ export default class Game {
     window.requestAnimationFrame(this.loop);
   }
 
-  //**********************************************************************
+  // **********************************************************************
   // Update Functions
   //
   checkBullet = () => {
@@ -124,10 +127,19 @@ export default class Game {
     }
   }
 
-  //**********************************************************************
+  // **********************************************************************
   // Helper Functions
   //
 
+  // Create players
+  createPlayers = () => {
+    const [x1, y1, x2, y2] = initPositions(this.terrain);
+    const player1 = new Player(x1, y1, "red", INITIAL_ANGLE, DIRECTION_RIGHT);
+    const player2 = new Player(x2, y2, "blue", Math.PI - INITIAL_ANGLE, DIRECTION_LEFT);
+    return [player1, player2];
+  }
+
+  // Generate, make fly, check hit for the bullet EACH TIME PLAYER SHOOTS
   handleBullet = () => {
     // Generate bullet only once each time space is pressed
     if (this.bulletFlyingTime === 0) { 
@@ -151,13 +163,13 @@ export default class Game {
       this.checkHit++;
     }
 
-    // Reset bullet and player force if bullet goes out of canvas (except for top side)
+    // Change turn if bullet goes out of canvas (except for top side)
     if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT) {
       this.nextTurn();
       return;
     }
 
-    // Crashed Bullet
+    // Bullet Crashed Terrain
     this.handleBulletCrashed();
   }
 
@@ -222,6 +234,7 @@ export default class Game {
     }
   }
 
+  // Check direct player hit
   checkDirectHitPlayer = () => {
     let distance = Math.sqrt(Math.pow((this.players[(this.turn + 1) % this.numPlayers].x - this.bullet.x), 2) + Math.pow((this.players[(this.turn + 1) % this.numPlayers].y - this.bullet.y), 2));
     if (distance < (PLAYER_RADIUS + BULLET_RADIUS)){
@@ -230,6 +243,7 @@ export default class Game {
     return false;
   }
 
+  // Check splash player hit
   checkSplashHitPlayer = (clashPointX, clashPointY) => {
     let distance = Math.sqrt(Math.pow((this.players[(this.turn + 1) % this.numPlayers].x - clashPointX), 2) + Math.pow((this.players[(this.turn + 1) % this.numPlayers].y - clashPointY), 2));
     if (distance < (PLAYER_RADIUS + BULLET_RADIUS*10)){
@@ -238,6 +252,7 @@ export default class Game {
     return false;
   }
 
+  // Decrease player health
   decreaseHealth = (player) => {
     player.health -= DAMAGE;
     // This player loses
@@ -247,36 +262,29 @@ export default class Game {
     }
   }
 
-  nextTurn = () => {// console.log("Bullet out. You can shoot now")
+  // Update turn
+  nextTurn = () => {
+    // Reset changed value
     this.hasFlyingBullet = false;
     this.bullet = null;
     this.bulletFlyingTime = 0;
     this.players[this.turn].force = 0;
     this.checkHit = 0;
-
-    // In case player never released key --> When turn comes back, value of _Pressed still be true
+    this.players[this.turn].moveCount = 0;
+    // In case player never released key --> When turn comes back, value of _Pressed would still be true
     this.players[this.turn].spacePressed = false;
     this.players[this.turn].upPressed = false;
     this.players[this.turn].rightPressed = false;
     this.players[this.turn].downPressed = false;
     this.players[this.turn].leftPressed = false;
-
-    // Reset amount of movement allowed before switching turn
-    this.players[this.turn].moveCount = 0;
     // Change turn
     this.turn = (this.turn + 1) % this.numPlayers;
   }
 
+  // Announce winner
   announceWinner = (this_turn) => {
     alert(`Player ${this_turn} wins!`);
-  }
-
-  // Create players
-  createPlayers = () => {
-    const [x1, y1, x2, y2] = initPositions(this.terrain);
-    const player1 = new Player(x1, y1, "red", INITIAL_ANGLE, DIRECTION_RIGHT);
-    const player2 = new Player(x2, y2, "blue", Math.PI - INITIAL_ANGLE, DIRECTION_LEFT);
-    return [player1, player2];
+    this.end = true;
   }
 }
 

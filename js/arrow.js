@@ -1,5 +1,5 @@
 import { ARROW_LENGTH, ARROW_WIDTH } from './constants.js';
-import { canvas, context } from './game.js';
+import { context } from './game.js';
 
 export default class Arrow{
     constructor(color, length = ARROW_LENGTH, width = ARROW_WIDTH) {
