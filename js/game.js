@@ -1,8 +1,9 @@
 import Player, { initPositions } from './player.js';
 import Arrow from './arrow.js';
 import Terrain from './terrain.js';
+import HealthBar from './health-bar.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY } from './constants.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, DAMAGE } from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -25,9 +26,6 @@ export default class Game {
     this.hasFlyingBullet = false;
     this.bulletFlyingTime = 0;
     this.bullet = null;
-    // test bullet
-    // this.hasFlyingBullet = true;
-    // this.bullet = new Bullet(150, 150, 45, 5, 5, "red");
   }
 
   //**********************************************************************
@@ -59,6 +57,12 @@ export default class Game {
       this.players[i].drawPlayer();
       let arrow = new Arrow(this.players[i].color);
       arrow.drawArrow(this.players[i]);
+    }
+
+    // Draw health bars
+    for (let i = 0; i < this.players.length; i++) {
+      let healthbar = new HealthBar(this.players[i].x - HEALTH_BAR_WIDTH/2, this.players[i].y - PLAYER_RADIUS*2 - HEALTH_BAR_HEIGHT*2, this.players[i].health, "green");
+      healthbar.drawHealth();
     }
 
     // Draw bullet if exists
@@ -164,6 +168,12 @@ export default class Game {
       this.setTiles = tempTiles;
       this.terrain.updateImageData();
       // this.handlePlayerFall();
+
+      // TODO: if bullet hits the OTHER player, decrease health of OTHER player
+      // if (checkHit){
+        this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
+      // }
+
       this.nextTurn();
       // console.log(this.terrain.tiles[roundX][roundY]);
     }
@@ -190,6 +200,15 @@ export default class Game {
     }
   }
 
+  decreaseHealth = (player) => {
+    player.health -= DAMAGE;
+    // This player loses
+    // TODO: Final health decrease is not yet drawn, but annoucement was already made.
+    if (this.players[(this.turn + 1) % this.numPlayers].health == 0){
+      this.announceWinner(this.players[this.turn].color);
+    }
+  }
+
   nextTurn = () => {// console.log("Bullet out. You can shoot now")
     this.hasFlyingBullet = false;
     this.bullet = null;
@@ -209,8 +228,8 @@ export default class Game {
     this.turn = (this.turn + 1) % this.numPlayers;
   }
 
-  announceWinner = player => {
-    alert(`Player ${player} wins!`);
+  announceWinner = (this_turn) => {
+    alert(`Player ${this_turn} wins!`);
   }
 
   // Create players

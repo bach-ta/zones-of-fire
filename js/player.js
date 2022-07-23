@@ -1,4 +1,4 @@
-import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP } from './constants.js';
+import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH } from './constants.js';
 import Game, { canvas, context } from './game.js';
 
 // Player Objects
@@ -6,7 +6,7 @@ export default class Player{
     
     constructor(x, y, color, angle = 0, direction){
         this.color = color;
-        this.health = 100;
+        this.health = MAX_HEALTH;
         this.moveSpeed = PLAYER_SPEED;
         
         this.x = x;
@@ -96,7 +96,7 @@ export default class Player{
     
     //Niệm chiêu. Max = 100
     changeForce = () => {
-        console.log("change");
+        // console.log("change");
         if (this.force < 100){
             this.force += FORCE_STEP;
         }
