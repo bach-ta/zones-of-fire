@@ -26,6 +26,8 @@ export default class Game {
     this.hasFlyingBullet = false;
     this.bulletFlyingTime = 0;
     this.bullet = null;
+    this.trackBulletX = [];
+    this.trackBulletY = [];
   }
 
   //**********************************************************************
@@ -132,10 +134,14 @@ export default class Game {
       let bulletStartY = this.players[this.turn].y + ARROW_LENGTH*Math.sin(this.players[this.turn].angle);
       this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].angle, this.players[this.turn].force, BULLET_RADIUS, this.players[this.turn].color);
     }
-    
+
     // Flying bullet
-    this.bullet.x += 1*(this.bullet.velocity * Math.cos(this.bullet.bulletAngle));
-    this.bullet.y -= (-this.bullet.velocity * Math.sin(this.bullet.bulletAngle)) - ((1/2 * GRAVITY)*(Math.pow(this.bulletFlyingTime + 1,2) - Math.pow(this.bulletFlyingTime,2)));
+    for (let i = 0; i < 100; i++) {
+      this.bullet.x += 0.01 * (this.bullet.velocity * Math.cos(this.bullet.bulletAngle));
+      this.bullet.y -= 0.01 * ((-this.bullet.velocity * Math.sin(this.bullet.bulletAngle)) - ((1/2 * GRAVITY)*(Math.pow(this.bulletFlyingTime + 1,2) - Math.pow(this.bulletFlyingTime,2))));
+      this.trackBulletX[i] = this.bullet.x;
+      this.trackBulletY[i] = this.bullet.y;
+    }
     this.bulletFlyingTime += 1;
 
     // Reset bullet and player force if bullet goes out of canvas (except for top side)
@@ -151,18 +157,34 @@ export default class Game {
   // Handle if bullet had clash with terrain
   handleBulletCrashed = () => {
     let tempTiles = this.terrain.getTiles;
+    
     let roundX = Math.round(this.bullet.x);
     let roundY = Math.round(this.bullet.y);
+
+    let clashPointX = 0;
+    let clashPointY = 0;
     
+    // Find first clash point
+    for (let i = 0; i < 100; i++) {
+      let tempCeilX = Math.ceil(this.trackBulletX[i]);
+      let tempCeilY = Math.ceil(this.trackBulletY[i]);
+      if (tempTiles[tempCeilX][tempCeilY] == 1) {
+        clashPointX = tempCeilX;
+        clashPointY = tempCeilY;
+        console.log("Found Touch Point!");
+        break;
+      }
+    }
+
     // Handle clash
-    if (this.terrain.getTiles[roundX][Math.round(roundY)] == 1) {
+    if (clashPointY != 0) {
       tempTiles = this.terrain.getTiles;
       for (let i = 0; i < this.bullet.radius * 10; i++) {
         for (let j = 0; j < this.bullet.radius * 10; j++) {
-          if (roundX + i < WIDTH && roundY + j < HEIGHT) tempTiles[roundX + i][roundY + j] = 0;
-          if (roundX - i >= 0 && roundY + j < HEIGHT) tempTiles[roundX - i][roundY + j] = 0;
-          if (roundX + i < WIDTH && roundY - j >= 0) tempTiles[roundX + i][roundY - j] = 0;
-          if (roundX - i >= 0 && roundY - j >= 0) tempTiles[roundX - i][roundY - j] = 0;
+          if (clashPointX + i < WIDTH && clashPointY + j < HEIGHT) tempTiles[clashPointX + i][clashPointY + j] = 0;
+          if (clashPointX - i >= 0 && clashPointY + j < HEIGHT) tempTiles[clashPointX - i][clashPointY + j] = 0;
+          if (clashPointX + i < WIDTH && clashPointY - j >= 0) tempTiles[clashPointX + i][clashPointY - j] = 0;
+          if (clashPointX - i >= 0 && clashPointY - j >= 0) tempTiles[clashPointX - i][clashPointY - j] = 0;
         }
       }
       this.setTiles = tempTiles;
