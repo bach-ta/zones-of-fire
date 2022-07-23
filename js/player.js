@@ -26,8 +26,26 @@ export default class Player{
         this.direction = direction;
     }
 
+    // Getter
+    get getX() {
+        return this.x;
+    }
+
+    get getY() {
+        return this.y;
+    }
+
+    // Setter
+    set setX(x) {
+        this.x = x;
+    }
+
+    set setY(y) {
+        this.y = y;
+    }
+
     //**********************************************************************
-    //Player methods
+    // Player methods
     //
 
     // Draw player

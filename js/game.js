@@ -122,21 +122,71 @@ export default class Game {
   //
 
   handleBullet = () => {
-    //Generate bullet only once each time space is pressed
+    // Generate bullet only once each time space is pressed
     if (this.bulletFlyingTime === 0) { 
       let bulletStartX = this.players[this.turn].x + ARROW_LENGTH*Math.cos(this.players[this.turn].angle);
       let bulletStartY = this.players[this.turn].y + ARROW_LENGTH*Math.sin(this.players[this.turn].angle);
       this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].angle, this.players[this.turn].force, BULLET_RADIUS, this.players[this.turn].color);
     }
     
-    //Flying bullet
+    // Flying bullet
     this.bullet.x += 1*(this.bullet.velocity * Math.cos(this.bullet.bulletAngle));
     this.bullet.y -= (-this.bullet.velocity * Math.sin(this.bullet.bulletAngle)) - ((1/2 * GRAVITY)*(Math.pow(this.bulletFlyingTime + 1,2) - Math.pow(this.bulletFlyingTime,2)));
     this.bulletFlyingTime += 1;
 
-    //Reset bullet and player force if bullet goes out of canvas (except for top side)
+    // Reset bullet and player force if bullet goes out of canvas (except for top side)
     if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT) {
       this.nextTurn();
+      return;
+    }
+
+    // Crashed Bullet
+    this.handleBulletCrashed();
+  }
+
+  // Handle if bullet had clash with terrain
+  handleBulletCrashed = () => {
+    let tempTiles = this.terrain.getTiles;
+    let roundX = Math.round(this.bullet.x);
+    let roundY = Math.round(this.bullet.y);
+    
+    // Handle clash
+    if (this.terrain.getTiles[roundX][Math.round(roundY)] == 1) {
+      tempTiles = this.terrain.getTiles;
+      for (let i = 0; i < this.bullet.radius * 10; i++) {
+        for (let j = 0; j < this.bullet.radius * 10; j++) {
+          if (roundX + i < WIDTH && roundY + j < HEIGHT) tempTiles[roundX + i][roundY + j] = 0;
+          if (roundX - i >= 0 && roundY + j < HEIGHT) tempTiles[roundX - i][roundY + j] = 0;
+          if (roundX + i < WIDTH && roundY - j >= 0) tempTiles[roundX + i][roundY - j] = 0;
+          if (roundX - i >= 0 && roundY - j >= 0) tempTiles[roundX - i][roundY - j] = 0;
+        }
+      }
+      this.setTiles = tempTiles;
+      this.terrain.updateImageData();
+      // this.handlePlayerFall();
+      this.nextTurn();
+      // console.log(this.terrain.tiles[roundX][roundY]);
+    }
+  }
+
+  // Handle player fall
+  // FIXME: This functions is NOT ready for use
+  handlePlayerFall = () => {
+    console.log(this.players);
+
+    let tempTiles = this.terrain.getTiles;
+    for (let i = 0; i < this.players.length; i++) {
+      let currentPlayer = this.players[i];
+      let roundX = Math.round(currentPlayer.getX);
+      let roundY = Math.round(currentPlayer.getY);
+
+      if (tempTiles[roundX][roundY] == 0) {
+        for (let j = roundY; j < WIDTH; j++) {
+          if (tempTiles[roundX][j] = 1) {
+            this.players[i].setY = j;
+          }
+        }
+      }
     }
   }
 
@@ -146,16 +196,16 @@ export default class Game {
     this.bulletFlyingTime = 0;
     this.players[this.turn].force = 0;
 
-    //In case player never released key --> When turn comes back, value of _Pressed still be true
+    // In case player never released key --> When turn comes back, value of _Pressed still be true
     this.players[this.turn].spacePressed = false;
     this.players[this.turn].upPressed = false;
     this.players[this.turn].rightPressed = false;
     this.players[this.turn].downPressed = false;
     this.players[this.turn].leftPressed = false;
 
-    //Reset amount of movement allowed before switching turn
+    // Reset amount of movement allowed before switching turn
     this.players[this.turn].moveCount = 0;
-    //Change turn
+    // Change turn
     this.turn = (this.turn + 1) % this.numPlayers;
   }
 

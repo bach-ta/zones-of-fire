@@ -4,25 +4,24 @@
 import { canvas, context } from './game.js'
 
 export default class Terrain {
-    /**
-     * Construct initial terrain
-     */
+    // Construct initial terrain
     constructor(mode="flat", width, height, fileName="") {
         this.width = width;
         this.height = height;
         this.tiles = [];
 
-        switch(mode) {
-            case "flat":
-                for (let i = 0; i < height; i++) {
-                    if (i < 2*height/3) {
-                        this.tiles[i] = Array(width).fill(0);
+        if (mode === "flat") {
+            for (let i = 0; i < width; i++) {
+                this.tiles[i] = [];
+                for(let j = 0; j < height; j++) {
+                    if (j < 2*height/3) {
+                        this.tiles[i][j] = 0;
                     } else {
-                        this.tiles[i] = Array(width).fill(1);
+                        this.tiles[i][j] = 1;
                     }
                 }
-                break;
-            case "random":
+            }
+        } else if (mode === "random") {
                 for (let i = 0; i < height; i++) {
                     let tempArr = []
                     for (let j = 0; j < width; j++) {
@@ -30,42 +29,21 @@ export default class Terrain {
                     }
                     this.tiles[i] = tempArr;
                 }
-                break;
-            case "custom":
-                // TODO: Read a .txt file and construct a map   
-                break;
-        }
-
-        // TEMPORARY FIXED COLOR MAP
-        let data32 = new Uint32Array(this.width * this.height);
-        let colorMap = [];
-
-        for(let x = 0; x < width; x++ ){
-            colorMap[x] = [];
-            for(var y = 0; y < height; y++ ){
-                if (y < 2*height/3) {
-                    colorMap[x][y] = "#000000";
-                } else {
-                    colorMap[x][y] = "#52525C";
-                }
-            }
-        }
-
-        // Flatten array
-        for(let x, y = 0, p = 0; y < this.height; y++){
-            for(x = 0; x < this.width; x++) {
-                data32[p++] = this.str2uint32(colorMap[x][y]);
-            }
+        } else if (mode === "custom") {
+                // TODO: Read a .txt file and construct a map
         }
 
         // Construct ImageData object
-        this.imageData = new ImageData(new Uint8ClampedArray(data32.buffer), this.width, this.height);
+        this.imageData = this.convertTilesToImageData(this.tiles);
+    }
 
-        // for (let i = 0; i < this.imageData.data.length; i++) {
-        //     let row = Math.round(i/this.width);
-        //     let col = Math.round(i%this.width);
-        //     this.imageData.data[i] = this.tiles[row][col];
-        // }
+    // Getter
+    get getTiles() {
+        return this.tiles;
+    }
+
+    set setTiles(tiles) {
+        this.tiles = tiles;
     }
 
     /**
@@ -94,7 +72,35 @@ export default class Terrain {
         context.stroke();
     }
 
+    updateImageData = () => {
+        // Update tiles also update image data
+        this.imageData = this.convertTilesToImageData(this.tiles);
+    }
+
     /* Helper function */
+    convertTilesToImageData = (tiles) => {
+        let data32 = new Uint32Array(this.width * this.height);
+        let colorMap = [];
+        for(let i = 0; i < this.width; i++) {
+            colorMap[i] = [];
+            for(let j = 0; j < this.height; j++) {
+                if (tiles[i][j] === 0) {
+                    colorMap[i][j] = "#000000";
+                } else {
+                    colorMap[i][j] = "#52525C";
+                }
+            }
+        }
+        // Flatten array
+        for(let x, y = 0, p = 0; y < this.height; y++) {
+            for(x = 0; x < this.width; x++) {
+                data32[p++] = this.str2uint32(colorMap[x][y]);
+            }
+        }
+        // Construct ImageData object
+        return new ImageData(new Uint8ClampedArray(data32.buffer), this.width, this.height);
+    }
+
     str2uint32 = (str) => {
         var n = ("0x" + str.substr(1))|0;
         return 0xff000000 | (n << 16) | (n & 0xff00) | (n >>> 16)
