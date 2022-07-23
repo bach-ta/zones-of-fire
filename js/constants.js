@@ -21,3 +21,8 @@ export const GRAVITY = 0.6;
 export const FORCE_STEP = 1;
 export const MAX_HEALTH = 50;
 export const DAMAGE = 10;
+
+// Angle
+export const MIN_ANGLE = -Math.PI * 5 / 12;
+export const MAX_ANGLE = -Math.PI / 12;
+export const INITIAL_ANGLE = (MIN_ANGLE + MAX_ANGLE) / 3;

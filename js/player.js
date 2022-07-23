@@ -1,4 +1,4 @@
-import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH } from './constants.js';
+import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE } from './constants.js';
 import Game, { canvas, context } from './game.js';
 
 // Player Objects
@@ -83,25 +83,27 @@ export default class Player{
         return changed;
     }
 
-    //Change angle (reverse sign since x,y axis are upside down)
-    changeAngle = () => { 
-        if (this.upPressed){
-            this.angle += (Math.PI/90) * (2 * this.direction - 1);
-        }
-        if (this.downPressed){
-            this.angle -= (Math.PI/90) * (2 * this.direction - 1);
-        }
-        // console.log(`Angle: ${this.angle}`);
+    //Change angle
+    changeAngle = () => {
+        let newAngle = 0;
+        if (this.upPressed) newAngle = this.angle + (Math.PI/90) * (2 * this.direction - 1);
+        else                newAngle = this.angle - (Math.PI/90) * (2 * this.direction - 1);
+
+        if (this.checkAngleRange(newAngle)) this.angle = newAngle;
+    }
+
+    checkAngleRange(angle) {
+        return      (this.direction === DIRECTION_RIGHT && angle >= MIN_ANGLE && angle <= MAX_ANGLE)
+                    ||
+                    (Math.PI - angle >= MIN_ANGLE && Math.PI - angle <= MAX_ANGLE);
     }
     
     //Niệm chiêu. Max = 100
     changeForce = () => {
-        // console.log("change");
         if (this.force < 100){
             this.force += FORCE_STEP;
         }
         document.querySelector('#show-force').textContent = this.force;
-        // console.log(`Force: ${this.force}`);
     }
     
     //Fire bullet
