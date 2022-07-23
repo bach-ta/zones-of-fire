@@ -1,4 +1,4 @@
-import { HEIGHT, WIDTH, MAX_MOVEMENT_ALLOWED, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE } from './constants.js';
+import { HEIGHT, WIDTH, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE } from './constants.js';
 import { context } from './game.js';
 
 // Player Objects
@@ -11,9 +11,10 @@ export default class Player{
         
         this.x = x;
         this.y = y;
-        this.moveCount = 0;
+        this.stamina = MAX_STAMINA;
         this.leftPressed = false;
         this.rightPressed = false;
+        this.allowMove = true;
 
         this.angle = angle;
         this.upPressed = false;
@@ -22,6 +23,7 @@ export default class Player{
         this.force = 0;
         this.spacePressed = false;
         this.spaceReleased = false;
+        this.forceIncrease = true;
 
         this.direction = direction;
     }
@@ -60,13 +62,13 @@ export default class Player{
     //!!!!!!!!!!!!!!Not yet able to move with terrain
     move = () => {
         if (this.changeDirection()) return;
-        if (this.moveCount < MAX_MOVEMENT_ALLOWED) {
+        if (this.stamina > 0 && this.allowMove) {
             if (this.leftPressed) {
                 this.x -= this.moveSpeed;
-                this.moveCount += 1;
+                this.stamina -= 1;
             } else {
                 this.x += this.moveSpeed;
-                this.moveCount += 1;
+                this.stamina -= 1;
             }
         }
     }
@@ -100,16 +102,26 @@ export default class Player{
     
     //Niệm chiêu. Max = 100
     changeForce = () => {
-        if (this.force < 100){
+        if (this.force >= 100){
+            this.forceIncrease = false;
+        }
+        if (this.force <= 0){
+            this.forceIncrease = true;
+        }
+        if (this.forceIncrease){
             this.force += FORCE_STEP;
         }
+        else{
+            this.force -= FORCE_STEP;
+        }
         document.querySelector('#show-force').textContent = this.force;
+        document.querySelector('#force-bar').style.width = this.force + "%";
     }
     
     //Fire bullet
     fire = () => {
         //Ban movement after firing
-        this.moveCount = MAX_MOVEMENT_ALLOWED;
+        this.allowMove = false;
     }
 
 }

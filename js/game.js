@@ -2,8 +2,9 @@ import Player, { initPositions } from './player.js';
 import Arrow from './arrow.js';
 import Terrain from './terrain.js';
 import HealthBar from './health-bar.js';
+import StaminaBar from './stamina-bar.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, DAMAGE, INITIAL_ANGLE } from './constants.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE } from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -65,10 +66,13 @@ export default class Game {
       arrow.drawArrow(this.players[i]);
     }
 
-    // Draw health bars
+    // Draw health bars and stamina bars
     for (let i = 0; i < this.players.length; i++) {
       let healthbar = new HealthBar(this.players[i].x - HEALTH_BAR_WIDTH/2, this.players[i].y - PLAYER_RADIUS*2 - HEALTH_BAR_HEIGHT*2, this.players[i].health, "green");
       healthbar.drawHealth();
+
+      let staminabar = new StaminaBar(this.players[i].x - STAMINA_BAR_WIDTH/2, this.players[i].y + PLAYER_RADIUS + STAMINA_BAR_HEIGHT, this.players[i].stamina, "lightblue");
+      staminabar.drawStamina();
     }
 
     // Draw bullet if exists
@@ -166,6 +170,7 @@ export default class Game {
     // Change turn if bullet goes out of canvas (except for top side)
     if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT) {
       this.nextTurn();
+      this.players[this.turn].stamina = MAX_STAMINA;      // Restore stamina for player just received turn
       return;
     }
 
@@ -212,6 +217,7 @@ export default class Game {
 
       this.handlePlayerFall();
       this.nextTurn();
+      this.players[this.turn].stamina = MAX_STAMINA;    // Restore stamina for player just received turn
     }
   }
 
@@ -270,7 +276,8 @@ export default class Game {
     this.bulletFlyingTime = 0;
     this.players[this.turn].force = 0;
     this.checkHit = 0;
-    this.players[this.turn].moveCount = 0;
+    this.players[this.turn].allowMove = true;
+    this.players[this.turn].forceIncrease = true;
     // In case player never released key --> When turn comes back, value of _Pressed would still be true
     this.players[this.turn].spacePressed = false;
     this.players[this.turn].upPressed = false;

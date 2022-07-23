@@ -7,9 +7,11 @@ export const ARROW_LENGTH = PLAYER_RADIUS * 2;
 export const ARROW_WIDTH = 10;
 export const HEALTH_BAR_HEIGHT = 10;
 export const HEALTH_BAR_WIDTH = 50;
+export const STAMINA_BAR_HEIGHT = 10;
+export const STAMINA_BAR_WIDTH = 50;
 
 // Moving
-export const MAX_MOVEMENT_ALLOWED = 50;
+export const MAX_STAMINA = 50;
 export const PLAYER_SPEED = 5;
 
 // Changing Direction
