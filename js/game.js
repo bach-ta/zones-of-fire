@@ -3,7 +3,7 @@ import Arrow from './arrow.js';
 import Terrain from './terrain.js';
 import HealthBar from './health-bar.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, DAMAGE } from './constants.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, DAMAGE, MIN_ANGLE, MAX_ANGLE, INITIAL_ANGLE } from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -256,8 +256,8 @@ export default class Game {
   // Create players
   createPlayers = () => {
     const [x1, y1, x2, y2] = initPositions(this.terrain);
-    const player1 = new Player(x1, y1, "red", 0, DIRECTION_RIGHT);
-    const player2 = new Player(x2, y2, "blue", Math.PI, DIRECTION_LEFT);
+    const player1 = new Player(x1, y1, "red", INITIAL_ANGLE, DIRECTION_RIGHT);
+    const player2 = new Player(x2, y2, "blue", Math.PI - INITIAL_ANGLE, DIRECTION_LEFT);
     return [player1, player2];
   }
 }
