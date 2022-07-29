@@ -1,6 +1,6 @@
 import Player, { initPositions } from './player.js';
 import Arrow from './arrow.js';
-import Terrain from './terrain.js';
+import { background, foreground } from './new_terrain.js';
 import HealthBar from './health-bar.js';
 import StaminaBar from './stamina-bar.js';
 import Bullet from './bullet.js';
@@ -8,6 +8,9 @@ import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RI
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
+
+let imageDataBackground;
+let imageDataForeground;
 
 export default class Game {
   /**********************************************************************
@@ -19,7 +22,7 @@ export default class Game {
     this.numPlayers = numPlayers;
 
     // Game objects
-    this.terrain = new Terrain("flat", WIDTH, HEIGHT);
+    this.terrain = background;
     this.players = this.createPlayers(this.terrain);
 
     // Game states
@@ -33,6 +36,17 @@ export default class Game {
 
     // End game
     this.end = false;
+  }
+
+  initTerrain = () => {
+    context.drawImage(background, 0, 0);
+    imageDataBackground = context.getImageData(0, 0, WIDTH, HEIGHT);
+
+    // console.log(imageDataBackground);
+
+    context.drawImage(foreground, 600, 100);
+    imageDataForeground = context.getImageData(0, 0, WIDTH, HEIGHT);
+    
   }
 
   // **********************************************************************
@@ -57,7 +71,7 @@ export default class Game {
   //
   draw = () => {
     // Draw terrain
-    this.terrain.drawTerrain();
+    this.initTerrain();
 
     // Draw players and arrows
     for (let i = 0; i < this.players.length; i++) {
@@ -85,10 +99,10 @@ export default class Game {
   // Game Loop
   //
   loop = () => {
+    window.requestAnimationFrame(this.loop);
     this.update();
     this.draw();
     // console.log("loop");
-    window.requestAnimationFrame(this.loop);
   }
 
   // **********************************************************************
@@ -178,9 +192,17 @@ export default class Game {
     this.handleBulletCrashed();
   }
 
+  getColor = (imageData, x, y) => {
+    const _rgba = [];
+    _rgba.push(imageData[(y * WIDTH + x) * 4])
+    _rgba.push(imageData[(y * WIDTH + x) * 4+1])
+    _rgba.push(imageData[(y * WIDTH + x) * 4+2])
+    _rgba.push(imageData[(y * WIDTH + x) * 4+3])
+    return _rgba.toString();
+  }
+
   // Handle if bullet had clash with terrain
   handleBulletCrashed = () => {
-    let tempTiles = this.terrain.getTiles;
     let clashPointX = 0;
     let clashPointY = 0;
 
@@ -188,7 +210,8 @@ export default class Game {
     for (let i = 0; i < 100; i++) {
       let tempCeilX = Math.ceil(this.trackBulletX[i]);
       let tempCeilY = Math.ceil(this.trackBulletY[i]);
-      if (tempTiles[tempCeilX][tempCeilY] == 1) {
+
+      if (this.getColor(imageDataBackground.data, tempCeilX, tempCeilY) !== this.getColor(imageDataForeground.data, tempCeilX, tempCeilY)) {
         clashPointX = tempCeilX;
         clashPointY = tempCeilY;
         console.log("Found Touch Point!");

@@ -1,4 +1,4 @@
-import { HEIGHT, WIDTH, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE } from './constants.js';
+import { HEIGHT, WIDTH, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y } from './constants.js';
 import { context } from './game.js';
 
 // Player Objects
@@ -128,10 +128,10 @@ export default class Player{
 
 // Initialize player positions
 export const initPositions = (terrain) => {
-    let x1 = 100;
-    let y1 = terrain.height/3*2 - PLAYER_RADIUS;
-    let x2 = WIDTH-x1;
-    let y2 = terrain.height/3*2 - PLAYER_RADIUS;
+    let x1 = INIT_PLAYER_X;
+    let y1 = INIT_PLAYER_Y;
+    let x2 = WIDTH-INIT_PLAYER_X;
+    let y2 = INIT_PLAYER_Y;
 
     return [x1, y1, x2, y2];
 }

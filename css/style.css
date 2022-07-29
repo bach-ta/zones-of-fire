@@ -4,7 +4,7 @@
 
 body{
     overflow: hidden;       /*Hide scrollbars when moving characters*/
-    background-color: bisque;
+    /* background-color: bisque; */
 }
 
 #game-title, #show-force {
@@ -30,7 +30,7 @@ body{
     position: absolute;
     top: 90%;
     left: 30%;
-    width: 1000px;
+    width: 40%;
     height: 30px;
     background-color: #464141;
     z-index: 2;
