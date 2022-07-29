@@ -1,6 +1,6 @@
 import Player, { initPositions } from './player.js';
 import Arrow from './arrow.js';
-import { background, foreground } from './new_terrain.js';
+import { background, foreground } from './sprite.js';
 import HealthBar from './health-bar.js';
 import StaminaBar from './stamina-bar.js';
 import Bullet from './bullet.js';
@@ -263,7 +263,7 @@ export default class Game {
         this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
       }
 
-      // this.handlePlayerFall();
+      this.handlePlayerFall();
       this.nextTurn();
       this.players[this.turn].stamina = MAX_STAMINA;    // Restore stamina for player just received turn
     }
@@ -271,19 +271,16 @@ export default class Game {
 
   // Handle player fall
   handlePlayerFall = () => {
-    console.log(this.players);
-
-    let tempTiles = this.terrain.getTiles;
 
     for (let i = 0; i < this.players.length; i++) {
       let currentPlayer = this.players[i];
-      let roundX = Math.ceil(currentPlayer.getX);
+      let currentX = Math.ceil(currentPlayer.getX);
       let currentY = Math.ceil(currentPlayer.getY + PLAYER_RADIUS + 1);
 
-      while (currentY < HEIGHT && tempTiles[roundX][currentY] == 0) {
+      while (currentY < HEIGHT && this.getColor(this.imageDataForeground, currentX, currentY).toString() !== this.getColor(this.imageDataBackground, currentX, currentY).toString()) {
         currentY++;
       }
-      if (currentY == HEIGHT) this.players[i].setY = 0;
+      if (currentY == HEIGHT) this.announceWinner(i);
       else this.players[i].setY = currentY - PLAYER_RADIUS - 1;
     }
   }
