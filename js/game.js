@@ -44,7 +44,7 @@ export default class Game {
     if (this.count <= 5) // TODO: ?
       this.imageDataBackground = context.getImageData(0, 0, WIDTH, HEIGHT);
     
-    context.drawImage(foreground, 600, 100);
+    context.drawImage(foreground, 0, 0);
     if (this.count <= 5) // TODO: ?
       this.imageDataForeground = context.getImageData(0, 0, WIDTH, HEIGHT);
     

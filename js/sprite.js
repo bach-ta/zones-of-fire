@@ -1,10 +1,10 @@
 import { context } from "./game.js";
 
 export const background = new Image()
-background.src = '../background.png'
+background.src = '../Finalbackground.png';
 
 export const foreground = new Image()
-foreground.src = '../temp_foreground.png';
+foreground.src = '../Finalforeground.png';
 
 export default class Sprite {
     constructor(image, x, y, velocity){
