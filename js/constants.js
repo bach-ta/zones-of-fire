@@ -11,6 +11,7 @@ export const STAMINA_BAR_HEIGHT = 10;
 export const STAMINA_BAR_WIDTH = 50;
 export const INIT_PLAYER_X = 100;
 export const INIT_PLAYER_Y = HEIGHT/3*2 - PLAYER_RADIUS;
+export const SPLASH_RADIUS = BULLET_RADIUS * 10;
 
 // Moving
 export const MAX_STAMINA = STAMINA_BAR_WIDTH;

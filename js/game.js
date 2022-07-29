@@ -4,13 +4,10 @@ import { background, foreground } from './new_terrain.js';
 import HealthBar from './health-bar.js';
 import StaminaBar from './stamina-bar.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE } from './constants.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS } from './constants.js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
-
-let imageDataBackground;
-let imageDataForeground;
 
 export default class Game {
   /**********************************************************************
@@ -24,6 +21,9 @@ export default class Game {
     // Game objects
     this.terrain = background;
     this.players = this.createPlayers(this.terrain);
+    this.imageDataBackground;
+    this.imageDataForeground;
+    this.count = 0;
 
     // Game states
     this.turn = 0;
@@ -38,15 +38,31 @@ export default class Game {
     this.end = false;
   }
 
+  // Initialize background and foreground
   initTerrain = () => {
     context.drawImage(background, 0, 0);
-    imageDataBackground = context.getImageData(0, 0, WIDTH, HEIGHT);
-
-    // console.log(imageDataBackground);
-
-    context.drawImage(foreground, 600, 100);
-    imageDataForeground = context.getImageData(0, 0, WIDTH, HEIGHT);
+    if (this.count <= 5) // TODO: ?
+      this.imageDataBackground = context.getImageData(0, 0, WIDTH, HEIGHT);
     
+    context.drawImage(foreground, 600, 100);
+    if (this.count <= 5) // TODO: ?
+      this.imageDataForeground = context.getImageData(0, 0, WIDTH, HEIGHT);
+    
+    this.count++;
+  }
+
+  get getBackground() {
+    return this.imageDataBackground
+  }
+  set setBackground(newBackground) {
+    this.imageDataBackground = newBackground;
+  }
+  
+  get getForeground() {
+    return this.imageDataForeground
+  }
+  set setForeground(newForeground) {
+    this.imageDataForeground = newForeground;
   }
 
   // **********************************************************************
@@ -71,7 +87,8 @@ export default class Game {
   //
   draw = () => {
     // Draw terrain
-    this.initTerrain();
+      this.initTerrain();
+      context.putImageData(this.imageDataForeground, 0, 0);
 
     // Draw players and arrows
     for (let i = 0; i < this.players.length; i++) {
@@ -102,7 +119,6 @@ export default class Game {
     window.requestAnimationFrame(this.loop);
     this.update();
     this.draw();
-    // console.log("loop");
   }
 
   // **********************************************************************
@@ -198,7 +214,7 @@ export default class Game {
     _rgba.push(imageData[(y * WIDTH + x) * 4+1])
     _rgba.push(imageData[(y * WIDTH + x) * 4+2])
     _rgba.push(imageData[(y * WIDTH + x) * 4+3])
-    return _rgba.toString();
+    return _rgba;
   }
 
   // Handle if bullet had clash with terrain
@@ -211,7 +227,7 @@ export default class Game {
       let tempCeilX = Math.ceil(this.trackBulletX[i]);
       let tempCeilY = Math.ceil(this.trackBulletY[i]);
 
-      if (this.getColor(imageDataBackground.data, tempCeilX, tempCeilY) !== this.getColor(imageDataForeground.data, tempCeilX, tempCeilY)) {
+      if (this.getColor(this.imageDataBackground.data, tempCeilX, tempCeilY).toString() !== this.getColor(this.imageDataForeground.data, tempCeilX, tempCeilY).toString()) {
         clashPointX = tempCeilX;
         clashPointY = tempCeilY;
         console.log("Found Touch Point!");
@@ -219,26 +235,35 @@ export default class Game {
       }
     }
 
+    let tempImageDataForeground = this.getForeground;
+
+    const SIGN_X = [1, -1, 1, -1];
+    const SIGN_Y = [1, 1, -1, -1];
+
     // Handle clash
     if (clashPointY != 0) {
-      tempTiles = this.terrain.getTiles;
-      for (let i = 0; i < this.bullet.radius * 10; i++) {
-        for (let j = 0; j < this.bullet.radius * 10; j++) {
-          if (clashPointX + i < WIDTH && clashPointY + j < HEIGHT) tempTiles[clashPointX + i][clashPointY + j] = 0;
-          if (clashPointX - i >= 0 && clashPointY + j < HEIGHT) tempTiles[clashPointX - i][clashPointY + j] = 0;
-          if (clashPointX + i < WIDTH && clashPointY - j >= 0) tempTiles[clashPointX + i][clashPointY - j] = 0;
-          if (clashPointX - i >= 0 && clashPointY - j >= 0) tempTiles[clashPointX - i][clashPointY - j] = 0;
+      for (let i = 0; i < SPLASH_RADIUS; i++) {
+        for (let j = 0; j < SPLASH_RADIUS; j++) {
+          for (let k = 0; k < 4; k++) {
+            let distance = Math.sqrt(Math.pow(i*SIGN_X[k], 2) + Math.pow((j*SIGN_Y[k]), 2));
+            if (distance < SPLASH_RADIUS) {
+              let backgroundPixelColor = this.getColor(this.imageDataBackground.data, clashPointX + i*SIGN_X[k], clashPointY + j*SIGN_Y[k]);
+              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4] = backgroundPixelColor[0];
+              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4 + 1] = backgroundPixelColor[1];
+              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4 + 2] = backgroundPixelColor[2];
+              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4 + 3] = backgroundPixelColor[3];
+            }
+          } 
         }
       }
-      this.setTiles = tempTiles;
-      this.terrain.updateImageData();
-      
+      this.setForeground = tempImageDataForeground;
+
       // Checks if bullet splash hit the OTHER player
       if (this.checkSplashHitPlayer(clashPointX, clashPointY) && this.checkHit === 0){
         this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
       }
 
-      this.handlePlayerFall();
+      // this.handlePlayerFall();
       this.nextTurn();
       this.players[this.turn].stamina = MAX_STAMINA;    // Restore stamina for player just received turn
     }
@@ -275,7 +300,7 @@ export default class Game {
   // Check splash player hit
   checkSplashHitPlayer = (clashPointX, clashPointY) => {
     let distance = Math.sqrt(Math.pow((this.players[(this.turn + 1) % this.numPlayers].x - clashPointX), 2) + Math.pow((this.players[(this.turn + 1) % this.numPlayers].y - clashPointY), 2));
-    if (distance < (PLAYER_RADIUS + BULLET_RADIUS*10)){
+    if (distance < (PLAYER_RADIUS + SPLASH_RADIUS)){
       return true;
     }
     return false;
