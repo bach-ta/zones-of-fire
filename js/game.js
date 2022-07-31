@@ -35,7 +35,7 @@ export default class Game {
     this.trackBulletY = [];
 
     // End game
-    this.end = false;
+    this.winner;
   }
 
   // Initialize background and foreground
@@ -80,6 +80,10 @@ export default class Game {
 
     // Check if there is a bullet
     this.checkBullet();
+
+    // Check if there is a winner
+    this.checkWinner();
+    
   }
 
   // **********************************************************************
@@ -124,9 +128,16 @@ export default class Game {
   // **********************************************************************
   // Update Functions
   //
-  checkBullet = () => {
-    if (this.hasFlyingBullet) {
-      this.handleBullet();
+  checkMove = () => {
+    if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed) {
+      this.players[this.turn].move();
+      //Check Boundary
+      if (this.players[this.turn].x < PLAYER_RADIUS) {
+        this.players[this.turn].x = PLAYER_RADIUS;
+      }
+      if (this.players[this.turn].x > WIDTH - PLAYER_RADIUS) {
+        this.players[this.turn].x = WIDTH - PLAYER_RADIUS;
+      }
     }
   }
 
@@ -148,16 +159,15 @@ export default class Game {
     }
   }
 
-  checkMove = () => {
-    if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed) {
-      this.players[this.turn].move();
-      //Check Boundary
-      if (this.players[this.turn].x < PLAYER_RADIUS) {
-        this.players[this.turn].x = PLAYER_RADIUS;
-      }
-      if (this.players[this.turn].x > WIDTH - PLAYER_RADIUS) {
-        this.players[this.turn].x = WIDTH - PLAYER_RADIUS;
-      }
+  checkBullet = () => {
+    if (this.hasFlyingBullet) {
+      this.handleBullet();
+    }
+  }
+
+  checkWinner = () => {
+    if (this.winner){
+      this.announceWinner(); 
     }
   }
 
@@ -256,7 +266,7 @@ export default class Game {
           } 
         }
       }
-      this.setForeground = tempImageDataForeground;
+      this.imageDataForeground = tempImageDataForeground;
 
       // Checks if bullet splash hit the OTHER player
       if (this.checkSplashHitPlayer(clashPointX, clashPointY) && this.checkHit === 0){
@@ -271,17 +281,18 @@ export default class Game {
 
   // Handle player fall
   handlePlayerFall = () => {
-
     for (let i = 0; i < this.players.length; i++) {
       let currentPlayer = this.players[i];
       let currentX = Math.ceil(currentPlayer.getX);
       let currentY = Math.ceil(currentPlayer.getY + PLAYER_RADIUS + 1);
 
-      while (currentY < HEIGHT && this.getColor(this.imageDataForeground, currentX, currentY).toString() !== this.getColor(this.imageDataBackground, currentX, currentY).toString()) {
+      while (currentY < HEIGHT && this.getColor(this.imageDataForeground.data, currentX, currentY).toString() === this.getColor(this.imageDataBackground.data, currentX, currentY).toString()) {
         currentY++;
+        this.players[i].setY = currentY - PLAYER_RADIUS - 1;
       }
-      if (currentY == HEIGHT) this.announceWinner(i);
-      else this.players[i].setY = currentY - PLAYER_RADIUS - 1;
+      if (currentY === HEIGHT){
+        this.winner = this.players[(i + 1) % this.numPlayers];
+      }
     }
   }
 
@@ -307,9 +318,8 @@ export default class Game {
   decreaseHealth = (player) => {
     player.health -= DAMAGE;
     // This player loses
-    // TODO: Final health decrease is not yet drawn, but annoucement was already made.
     if (this.players[(this.turn + 1) % this.numPlayers].health == 0){
-      this.announceWinner(this.players[this.turn].color);
+      this.winner = this.players[this.turn];
     }
   }
 
@@ -334,9 +344,10 @@ export default class Game {
   }
 
   // Announce winner
-  announceWinner = (this_turn) => {
-    alert(`Player ${this_turn} wins!`);
-    this.end = true;
+  announceWinner = () => {
+    alert(`Player ${this.winner.color} wins!`);
+    // TODO: Final health decrease/player fall is not yet drawn, but annoucement was already made.
+    // TODO: Game restart
   }
 }
 
