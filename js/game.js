@@ -1,10 +1,10 @@
 import Player, { initPositions } from './player.js';
-import Arrow from './arrow.js';
-import { background, foreground } from './sprite.js';
+import { background, foreground } from './images.js';
 import HealthBar from './health-bar.js';
 import StaminaBar from './stamina-bar.js';
 import Bullet from './bullet.js';
 import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS } from './constants.js';
+import Border from './border (unused).js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -35,7 +35,7 @@ export default class Game {
     this.trackBulletY = [];
 
     // End game
-    this.winner;
+    this.frameID;
   }
 
   // Initialize background and foreground
@@ -47,7 +47,6 @@ export default class Game {
     context.drawImage(foreground, 0, 0);
     if (this.count <= 5) // TODO: ?
       this.imageDataForeground = context.getImageData(0, 0, WIDTH, HEIGHT);
-    
     this.count++;
   }
 
@@ -69,6 +68,9 @@ export default class Game {
   // Update the state of the game
   //
   update = () => {
+    // Check if there is a winner
+    this.checkWinner();
+
     //Check if user moved
     this.checkMove();
 
@@ -80,10 +82,6 @@ export default class Game {
 
     // Check if there is a bullet
     this.checkBullet();
-
-    // Check if there is a winner
-    this.checkWinner();
-    
   }
 
   // **********************************************************************
@@ -97,8 +95,7 @@ export default class Game {
     // Draw players and arrows
     for (let i = 0; i < this.players.length; i++) {
       this.players[i].drawPlayer();
-      let arrow = new Arrow(this.players[i].color);
-      arrow.drawArrow(this.players[i]);
+      this.players[i].arrow.drawArrow(this.players[i]); 
     }
 
     // Draw health bars and stamina bars
@@ -113,14 +110,14 @@ export default class Game {
     // Draw bullet if exists
     if (this.hasFlyingBullet) {
       this.bullet.drawBullet();
-    }
+    };
   }
 
   // **********************************************************************
   // Game Loop
   //
   loop = () => {
-    window.requestAnimationFrame(this.loop);
+    this.frameID = window.requestAnimationFrame(this.loop);
     this.update();
     this.draw();
   }
@@ -166,8 +163,20 @@ export default class Game {
   }
 
   checkWinner = () => {
-    if (this.winner){
-      this.announceWinner(); 
+    // Check if both player fell down
+    if (this.players.every( (player) => player.y + PLAYER_RADIUS + 1 === HEIGHT)){
+      alert("It's a tie!");
+      window.cancelAnimationFrame(this.frameID);
+      this.restart();
+    }
+    else{
+      for (let i = 0; i < this.players.length; i++){
+        if (this.players[i].health === 0 || this.players[i].y + PLAYER_RADIUS + 1 === HEIGHT){
+          alert(`Player ${this.players[(i + 1) % this.numPlayers].color} wins!`)
+          window.cancelAnimationFrame(this.frameID);
+          this.restart();
+        }
+      }
     }
   }
 
@@ -187,9 +196,9 @@ export default class Game {
   handleBullet = () => {
     // Generate bullet only once each time space is pressed
     if (this.bulletFlyingTime === 0) { 
-      let bulletStartX = this.players[this.turn].x + ARROW_LENGTH*Math.cos(this.players[this.turn].angle);
-      let bulletStartY = this.players[this.turn].y + ARROW_LENGTH*Math.sin(this.players[this.turn].angle);
-      this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].angle, this.players[this.turn].force, BULLET_RADIUS, this.players[this.turn].color);
+      let bulletStartX = this.players[this.turn].x + ARROW_LENGTH*Math.cos(this.players[this.turn].arrow.angle);
+      let bulletStartY = this.players[this.turn].y + ARROW_LENGTH*Math.sin(this.players[this.turn].arrow.angle);
+      this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].arrow.angle, this.players[this.turn].force, BULLET_RADIUS, this.players[this.turn].color);
     }
 
     // Flying bullet
@@ -201,7 +210,7 @@ export default class Game {
     }
     this.bulletFlyingTime += 1;
 
-    // Checks if bullet directly hit the OTHER player
+    // Checks if bullet directly hit the OTHER player. Limit number of times we decrease player health by 1 (this.checkHit)
     if (this.checkDirectHitPlayer() && this.checkHit === 0){
       this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
       this.checkHit++;
@@ -218,6 +227,7 @@ export default class Game {
     this.handleBulletCrashed();
   }
 
+  // Get color data at position x, y
   getColor = (imageData, x, y) => {
     const _rgba = [];
     _rgba.push(imageData[(y * WIDTH + x) * 4])
@@ -236,11 +246,9 @@ export default class Game {
     for (let i = 0; i < 100; i++) {
       let tempCeilX = Math.ceil(this.trackBulletX[i]);
       let tempCeilY = Math.ceil(this.trackBulletY[i]);
-
       if (this.getColor(this.imageDataBackground.data, tempCeilX, tempCeilY).toString() !== this.getColor(this.imageDataForeground.data, tempCeilX, tempCeilY).toString()) {
         clashPointX = tempCeilX;
         clashPointY = tempCeilY;
-        console.log("Found Touch Point!");
         break;
       }
     }
@@ -251,11 +259,12 @@ export default class Game {
     const SIGN_Y = [1, 1, -1, -1];
 
     // Handle clash
+    // TODO: Fix bug clash affects the other side
     if (clashPointY != 0) {
       for (let i = 0; i < SPLASH_RADIUS; i++) {
         for (let j = 0; j < SPLASH_RADIUS; j++) {
           for (let k = 0; k < 4; k++) {
-            let distance = Math.sqrt(Math.pow(i*SIGN_X[k], 2) + Math.pow((j*SIGN_Y[k]), 2));
+            let distance = Math.sqrt(Math.pow(i, 2) + Math.pow(j, 2));
             if (distance < SPLASH_RADIUS) {
               let backgroundPixelColor = this.getColor(this.imageDataBackground.data, clashPointX + i*SIGN_X[k], clashPointY + j*SIGN_Y[k]);
               tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4] = backgroundPixelColor[0];
@@ -263,7 +272,7 @@ export default class Game {
               tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4 + 2] = backgroundPixelColor[2];
               tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4 + 3] = backgroundPixelColor[3];
             }
-          } 
+          }
         }
       }
       this.imageDataForeground = tempImageDataForeground;
@@ -289,9 +298,6 @@ export default class Game {
       while (currentY < HEIGHT && this.getColor(this.imageDataForeground.data, currentX, currentY).toString() === this.getColor(this.imageDataBackground.data, currentX, currentY).toString()) {
         currentY++;
         this.players[i].setY = currentY - PLAYER_RADIUS - 1;
-      }
-      if (currentY === HEIGHT){
-        this.winner = this.players[(i + 1) % this.numPlayers];
       }
     }
   }
@@ -341,15 +347,26 @@ export default class Game {
     this.players[this.turn].leftPressed = false;
     // Change turn
     this.turn = (this.turn + 1) % this.numPlayers;
+    document.querySelector('#last-force-bar').style.width = this.players[this.turn].lastForce + "%"
   }
 
-  // Announce winner
-  announceWinner = () => {
-    alert(`Player ${this.winner.color} wins!`);
-    // TODO: Final health decrease/player fall is not yet drawn, but annoucement was already made.
-    // TODO: Game restart
+  // getBorders = () => {
+  //   const borderList = [];
+  //   for (let x = 0; x < WIDTH; x++){
+  //     for (let y = 0; y < HEIGHT; y++){
+  //       //const surroundingPixels = [[x-1,y-1],[x,y-1],[x+1,y-1],[x-1,y],[x+1,y],[x-1,y+1],[x,y+1],[x+1,y+1]]
+  //       //for (let pixel = 0; pixel < 8; pixel++){
+  //         if (this.getColor(this.imageDataForeground.data, x+1, y+1).toString() === this.getColor(this.imageDataBackground.data, x+1, y+1).toString()){
+  //           borderList.push(new Border(x,y));
+  //           //break;
+  //         }
+  //       }
+  //     //}
+  //   }
+  //   return borderList;
+  // }
+
+  restart = () => {
+    console.log("ok");
   }
 }
-
-
-

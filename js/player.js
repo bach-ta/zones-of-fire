@@ -1,31 +1,35 @@
+import Arrow from './arrow.js';
 import { HEIGHT, WIDTH, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y } from './constants.js';
 import { context } from './game.js';
 
 // Player Objects
 export default class Player{
     
-    constructor(x, y, color, angle = 0, direction){
+    constructor(x, y, color, angle, direction){
+        // Attributes
         this.color = color;
-        this.health = MAX_HEALTH;
         this.moveSpeed = PLAYER_SPEED;
-        
+        // Movements & locations
         this.x = x;
         this.y = y;
-        this.stamina = MAX_STAMINA;
         this.leftPressed = false;
         this.rightPressed = false;
         this.allowMove = true;
-
-        this.angle = angle;
+        // Arrow
+        this.arrow = new Arrow(angle, color);
+        this.direction = direction;
         this.upPressed = false;
         this.downPressed = false;
-
+        // Force
         this.force = 0;
+        this.lastForce = 0;
         this.spacePressed = false;
         this.spaceReleased = false;
         this.forceIncrease = true;
-
-        this.direction = direction;
+        // Health
+        this.health = MAX_HEALTH;
+        // Stamina
+        this.stamina = MAX_STAMINA;
     }
 
     // Getter
@@ -58,8 +62,8 @@ export default class Player{
         context.fill();
     }
     
-    //Move Player 
-    //!!!!!!!!!!!!!!Not yet able to move with terrain
+    // Move Player 
+    // TODO: Player move with terrain
     move = () => {
         if (this.changeDirection()) return;
         if (this.stamina > 0 && this.allowMove) {
@@ -76,10 +80,10 @@ export default class Player{
     changeDirection = () => {
         let changed = false;
         if (this.leftPressed) {
-            if (this.direction === DIRECTION_RIGHT) this.angle = Math.PI - this.angle, changed = true;
+            if (this.direction === DIRECTION_RIGHT) this.arrow.angle = Math.PI - this.arrow.angle, changed = true;
             this.direction = DIRECTION_LEFT;
         } else {
-            if (this.direction === DIRECTION_LEFT) this.angle = Math.PI - this.angle, changed = true;
+            if (this.direction === DIRECTION_LEFT) this.arrow.angle = Math.PI - this.arrow.angle, changed = true;
             this.direction = DIRECTION_RIGHT;
         }
         return changed;
@@ -88,10 +92,10 @@ export default class Player{
     //Change angle
     changeAngle = () => {
         let newAngle = 0;
-        if (this.upPressed) newAngle = this.angle + (Math.PI/90) * (2 * this.direction - 1);
-        else                newAngle = this.angle - (Math.PI/90) * (2 * this.direction - 1);
+        if (this.upPressed) newAngle = this.arrow.angle + (Math.PI/90) * (2 * this.direction - 1);
+        else                newAngle = this.arrow.angle - (Math.PI/90) * (2 * this.direction - 1);
 
-        if (this.checkAngleRange(newAngle)) this.angle = newAngle;
+        if (this.checkAngleRange(newAngle)) this.arrow.angle = newAngle;
     }
 
     checkAngleRange(angle) {
@@ -122,8 +126,8 @@ export default class Player{
     fire = () => {
         //Ban movement after firing
         this.allowMove = false;
+        this.lastForce = this.force;
     }
-
 }
 
 // Initialize player positions

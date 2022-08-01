@@ -40,5 +40,10 @@ body{
     width: 0%;
     height: 30px;
     background-color: rgb(250, 137, 0);
-    color: #fff;
+}
+
+#last-force-bar {
+    width: 0%;
+    height: 30px;
+    background-color: rgb(255, 0, 0);
 }
