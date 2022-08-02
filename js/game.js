@@ -1,9 +1,7 @@
 import Player, { initPositions } from './player.js';
-import { background, foreground } from './images.js';
-import HealthBar from './health-bar.js';
-import StaminaBar from './stamina-bar.js';
 import Bullet from './bullet.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS } from './constants.js';
+import { BACKGROUND, FOREGROUND, WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS, CLIMBING_LIMIT } from './constants.js';
+import { HealthBar, StaminaBar, TurnArrow } from './supplementaries.js';
 import Border from './border (unused).js';
 
 export const canvas = document.querySelector('#canvas');
@@ -13,18 +11,20 @@ export default class Game {
   /**********************************************************************
   // Construct the intial states of the game
   // @param {} numPlayers 
-  */
+  ***********************************************************************/
   constructor(numPlayers = 2) {
     // Game config
     this.numPlayers = numPlayers;
-
-    // Game objects
-    this.terrain = background;
-    this.players = this.createPlayers(this.terrain);
     this.imageDataBackground;
     this.imageDataForeground;
-    this.count = 0;
+    this.restart();
+  }
 
+  restart = () => {
+    // Game objects
+    this.terrain = BACKGROUND;
+    this.players = this.createPlayers(this.terrain);
+    this.count = 0;
     // Game states
     this.turn = 0;
     this.hasFlyingBullet = false;
@@ -33,40 +33,22 @@ export default class Game {
     this.checkHit = 0;
     this.trackBulletX = [];
     this.trackBulletY = [];
-
-    // End game
-    this.frameID;
-  }
-
-  // Initialize background and foreground
-  initTerrain = () => {
-    context.drawImage(background, 0, 0);
-    if (this.count <= 5) // TODO: ?
-      this.imageDataBackground = context.getImageData(0, 0, WIDTH, HEIGHT);
-    
-    context.drawImage(foreground, 0, 0);
-    if (this.count <= 5) // TODO: ?
-      this.imageDataForeground = context.getImageData(0, 0, WIDTH, HEIGHT);
-    this.count++;
-  }
-
-  get getBackground() {
-    return this.imageDataBackground
-  }
-  set setBackground(newBackground) {
-    this.imageDataBackground = newBackground;
   }
   
-  get getForeground() {
-    return this.imageDataForeground
-  }
-  set setForeground(newForeground) {
-    this.imageDataForeground = newForeground;
+  // **********************************************************************
+  // Game Loop
+  // **********************************************************************
+
+  loop = () => {
+    this.frameID = window.requestAnimationFrame(this.loop);
+    this.update();
+    this.draw();
   }
 
   // **********************************************************************
   // Update the state of the game
-  //
+  // **********************************************************************
+
   update = () => {
     // Check if there is a winner
     this.checkWinner();
@@ -86,11 +68,12 @@ export default class Game {
 
   // **********************************************************************
   // Draw the game in the current frame
-  //
+  // **********************************************************************
+
   draw = () => {
     // Draw terrain
-      this.initTerrain();
-      context.putImageData(this.imageDataForeground, 0, 0);
+    this.initTerrain();
+    context.putImageData(this.imageDataForeground, 0, 0);
 
     // Draw players and arrows
     for (let i = 0; i < this.players.length; i++) {
@@ -98,7 +81,11 @@ export default class Game {
       this.players[i].arrow.drawArrow(this.players[i]); 
     }
 
-    // Draw health bars and stamina bars
+    // Draw turn arrow
+    let turnArrow = new TurnArrow(this.players[this.turn].x, this.players[this.turn].y);
+    turnArrow.drawTurnArrow();
+
+    // Draw health bars and stamina bars.
     for (let i = 0; i < this.players.length; i++) {
       let healthbar = new HealthBar(this.players[i].x - HEALTH_BAR_WIDTH/2, this.players[i].y - PLAYER_RADIUS*2 - HEALTH_BAR_HEIGHT*2, this.players[i].health, "green");
       healthbar.drawHealth();
@@ -114,26 +101,16 @@ export default class Game {
   }
 
   // **********************************************************************
-  // Game Loop
-  //
-  loop = () => {
-    this.frameID = window.requestAnimationFrame(this.loop);
-    this.update();
-    this.draw();
-  }
-
-  // **********************************************************************
   // Update Functions
-  //
+  // **********************************************************************
+
   checkMove = () => {
     if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed) {
-      this.players[this.turn].move();
-      //Check Boundary
-      if (this.players[this.turn].x < PLAYER_RADIUS) {
-        this.players[this.turn].x = PLAYER_RADIUS;
-      }
-      if (this.players[this.turn].x > WIDTH - PLAYER_RADIUS) {
-        this.players[this.turn].x = WIDTH - PLAYER_RADIUS;
+      this.blockCheck();
+      if (this.players[this.turn].allowMoveLeft || this.players[this.turn].allowMoveRight){
+        this.players[this.turn].move();
+        // Handle player fall/climb
+        this.handlePlayerFallClimb();
       }
     }
   }
@@ -145,7 +122,7 @@ export default class Game {
   }
 
   checkShoot = () => {
-    if (this.players[this.turn].spacePressed) {
+    if (this.players[this.turn].spacePressed && this.players[this.turn].allowForce) {
       this.players[this.turn].changeForce();
     }
     
@@ -166,14 +143,13 @@ export default class Game {
     // Check if both player fell down
     if (this.players.every( (player) => player.y + PLAYER_RADIUS + 1 === HEIGHT)){
       alert("It's a tie!");
-      window.cancelAnimationFrame(this.frameID);
       this.restart();
+
     }
     else{
       for (let i = 0; i < this.players.length; i++){
         if (this.players[i].health === 0 || this.players[i].y + PLAYER_RADIUS + 1 === HEIGHT){
           alert(`Player ${this.players[(i + 1) % this.numPlayers].color} wins!`)
-          window.cancelAnimationFrame(this.frameID);
           this.restart();
         }
       }
@@ -182,8 +158,34 @@ export default class Game {
 
   // **********************************************************************
   // Helper Functions
-  //
+  // **********************************************************************
 
+  // Background and foreground initialization, get & set
+  initTerrain = () => {
+    context.drawImage(BACKGROUND, 0, 0);
+    if (this.count <= 5) // TODO: ?
+      this.imageDataBackground = context.getImageData(0, 0, WIDTH, HEIGHT);
+    
+    context.drawImage(FOREGROUND, 0, 0);
+    if (this.count <= 5) // TODO: ?
+      this.imageDataForeground = context.getImageData(0, 0, WIDTH, HEIGHT);
+    this.count++;
+  }
+
+  get getBackground() {
+    return this.imageDataBackground
+  }
+  set setBackground(newBackground) {
+    this.imageDataBackground = newBackground;
+  }
+  
+  get getForeground() {
+    return this.imageDataForeground
+  }
+  set setForeground(newForeground) {
+    this.imageDataForeground = newForeground;
+  }
+  
   // Create players
   createPlayers = () => {
     const [x1, y1, x2, y2] = initPositions(this.terrain);
@@ -200,7 +202,6 @@ export default class Game {
       let bulletStartY = this.players[this.turn].y + ARROW_LENGTH*Math.sin(this.players[this.turn].arrow.angle);
       this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].arrow.angle, this.players[this.turn].force, BULLET_RADIUS, this.players[this.turn].color);
     }
-
     // Flying bullet
     for (let i = 0; i < 100; i++) {
       this.bullet.x += 0.01 * (this.bullet.velocity * Math.cos(this.bullet.bulletAngle));
@@ -209,20 +210,17 @@ export default class Game {
       this.trackBulletY[i] = this.bullet.y;
     }
     this.bulletFlyingTime += 1;
-
     // Checks if bullet directly hit the OTHER player. Limit number of times we decrease player health by 1 (this.checkHit)
     if (this.checkDirectHitPlayer() && this.checkHit === 0){
       this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
       this.checkHit++;
     }
-
     // Change turn if bullet goes out of canvas (except for top side)
     if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT) {
       this.nextTurn();
       this.players[this.turn].stamina = MAX_STAMINA;      // Restore stamina for player just received turn
       return;
     }
-
     // Bullet Crashed Terrain
     this.handleBulletCrashed();
   }
@@ -265,7 +263,9 @@ export default class Game {
         for (let j = 0; j < SPLASH_RADIUS; j++) {
           for (let k = 0; k < 4; k++) {
             let distance = Math.sqrt(Math.pow(i, 2) + Math.pow(j, 2));
-            if (distance < SPLASH_RADIUS) {
+            if (clashPointX + i*SIGN_X[k] >= 0 && clashPointX + i*SIGN_X[k] < WIDTH &&
+                clashPointY + j*SIGN_Y[k] >= 0 && clashPointY + j*SIGN_Y[k] < HEIGHT &&
+                distance < SPLASH_RADIUS) {
               let backgroundPixelColor = this.getColor(this.imageDataBackground.data, clashPointX + i*SIGN_X[k], clashPointY + j*SIGN_Y[k]);
               tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4] = backgroundPixelColor[0];
               tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4 + 1] = backgroundPixelColor[1];
@@ -282,22 +282,47 @@ export default class Game {
         this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
       }
 
-      this.handlePlayerFall();
+      this.handlePlayerFallClimb();
       this.nextTurn();
       this.players[this.turn].stamina = MAX_STAMINA;    // Restore stamina for player just received turn
     }
   }
 
-  // Handle player fall
-  handlePlayerFall = () => {
+  // Handle player fall/climb
+  handlePlayerFallClimb = () => {
     for (let i = 0; i < this.players.length; i++) {
       let currentPlayer = this.players[i];
       let currentX = Math.ceil(currentPlayer.getX);
       let currentY = Math.ceil(currentPlayer.getY + PLAYER_RADIUS + 1);
 
+      // Fall
       while (currentY < HEIGHT && this.getColor(this.imageDataForeground.data, currentX, currentY).toString() === this.getColor(this.imageDataBackground.data, currentX, currentY).toString()) {
         currentY++;
         this.players[i].setY = currentY - PLAYER_RADIUS - 1;
+      }
+      // Climb
+      if (currentY > 0 && this.getColor(this.imageDataForeground.data, currentX, currentY-1).toString() !== this.getColor(this.imageDataBackground.data, currentX, currentY-1).toString()) {
+        currentY--;
+        currentPlayer.setY = currentY - PLAYER_RADIUS - 1;
+      }
+    }
+  }
+
+  // Check if player is being blocked/reached boundary in either direction
+  blockCheck = () => {
+    let currentPlayer = this.players[this.turn];
+    let currentX = Math.ceil(currentPlayer.getX);
+    let currentY = Math.ceil(currentPlayer.getY + PLAYER_RADIUS + 1);
+    // Map boundaries
+    if (this.players[this.turn].x < PLAYER_RADIUS) currentPlayer.allowMoveLeft = false;
+    if (this.players[this.turn].x > WIDTH - PLAYER_RADIUS) currentPlayer.allowMoveRight = false;
+    // Cannot climb
+    for (let i = 0; i < CLIMBING_LIMIT; i++){
+      if (this.getColor(this.imageDataForeground.data, currentX + PLAYER_RADIUS, currentY-PLAYER_RADIUS-i).toString() !== this.getColor(this.imageDataBackground.data, currentX + PLAYER_RADIUS, currentY-PLAYER_RADIUS-i).toString()){
+        currentPlayer.allowMoveRight = false;
+      }
+      if (this.getColor(this.imageDataForeground.data, currentX - PLAYER_RADIUS, currentY-PLAYER_RADIUS-i).toString() !== this.getColor(this.imageDataBackground.data, currentX - PLAYER_RADIUS, currentY-PLAYER_RADIUS-i).toString()){
+        currentPlayer.allowMoveLeft = false;
       }
     }
   }
@@ -323,6 +348,7 @@ export default class Game {
   // Decrease player health
   decreaseHealth = (player) => {
     player.health -= DAMAGE;
+    player.health = Math.max(player.health, 0);
     // This player loses
     if (this.players[(this.turn + 1) % this.numPlayers].health == 0){
       this.winner = this.players[this.turn];
@@ -337,7 +363,9 @@ export default class Game {
     this.bulletFlyingTime = 0;
     this.players[this.turn].force = 0;
     this.checkHit = 0;
-    this.players[this.turn].allowMove = true;
+    this.players[this.turn].allowMoveLeft = true;
+    this.players[this.turn].allowMoveRight = true;
+    this.players[this.turn].allowForce = true;
     this.players[this.turn].forceIncrease = true;
     // In case player never released key --> When turn comes back, value of _Pressed would still be true
     this.players[this.turn].spacePressed = false;
@@ -347,26 +375,7 @@ export default class Game {
     this.players[this.turn].leftPressed = false;
     // Change turn
     this.turn = (this.turn + 1) % this.numPlayers;
+    document.querySelector('#force-bar').style.width = this.players[this.turn].force + "%"
     document.querySelector('#last-force-bar').style.width = this.players[this.turn].lastForce + "%"
-  }
-
-  // getBorders = () => {
-  //   const borderList = [];
-  //   for (let x = 0; x < WIDTH; x++){
-  //     for (let y = 0; y < HEIGHT; y++){
-  //       //const surroundingPixels = [[x-1,y-1],[x,y-1],[x+1,y-1],[x-1,y],[x+1,y],[x-1,y+1],[x,y+1],[x+1,y+1]]
-  //       //for (let pixel = 0; pixel < 8; pixel++){
-  //         if (this.getColor(this.imageDataForeground.data, x+1, y+1).toString() === this.getColor(this.imageDataBackground.data, x+1, y+1).toString()){
-  //           borderList.push(new Border(x,y));
-  //           //break;
-  //         }
-  //       }
-  //     //}
-  //   }
-  //   return borderList;
-  // }
-
-  restart = () => {
-    console.log("ok");
   }
 }

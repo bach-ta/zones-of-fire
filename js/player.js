@@ -1,5 +1,5 @@
-import Arrow from './arrow.js';
-import { HEIGHT, WIDTH, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y } from './constants.js';
+import { Arrow } from './supplementaries.js';
+import { HEIGHT, WIDTH, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y, STAMINA_STEP } from './constants.js';
 import { context } from './game.js';
 
 // Player Objects
@@ -14,7 +14,8 @@ export default class Player{
         this.y = y;
         this.leftPressed = false;
         this.rightPressed = false;
-        this.allowMove = true;
+        this.allowMoveLeft = true;
+        this.allowMoveRight = true;
         // Arrow
         this.arrow = new Arrow(angle, color);
         this.direction = direction;
@@ -26,6 +27,7 @@ export default class Player{
         this.spacePressed = false;
         this.spaceReleased = false;
         this.forceIncrease = true;
+        this.allowForce = true;
         // Health
         this.health = MAX_HEALTH;
         // Stamina
@@ -33,26 +35,15 @@ export default class Player{
     }
 
     // Getter
-    get getX() {
-        return this.x;
-    }
-
-    get getY() {
-        return this.y;
-    }
-
+    get getX() { return this.x; }
+    get getY() { return this.y; }
     // Setter
-    set setX(x) {
-        this.x = x;
-    }
-
-    set setY(y) {
-        this.y = y;
-    }
+    set setX(x) { this.x = x; }
+    set setY(y) { this.y = y; }
 
     //**********************************************************************
     // Player methods
-    //
+    //**********************************************************************
 
     // Draw player
     drawPlayer = () => {
@@ -63,16 +54,18 @@ export default class Player{
     }
     
     // Move Player 
-    // TODO: Player move with terrain
+    // TODO: Player move with terrain boundaries
     move = () => {
         if (this.changeDirection()) return;
-        if (this.stamina > 0 && this.allowMove) {
-            if (this.leftPressed) {
+        if (this.stamina > 0) {
+            if (this.leftPressed && this.allowMoveLeft) {
                 this.x -= this.moveSpeed;
-                this.stamina -= 1;
-            } else {
+                this.allowMoveRight = true;
+                this.stamina -= STAMINA_STEP;
+            } else if (this.rightPressed && this.allowMoveRight) {
                 this.x += this.moveSpeed;
-                this.stamina -= 1;
+                this.allowMoveLeft = true;
+                this.stamina -= STAMINA_STEP;
             }
         }
     }
@@ -118,14 +111,15 @@ export default class Player{
         else{
             this.force -= FORCE_STEP;
         }
-        document.querySelector('#show-force').textContent = this.force;
         document.querySelector('#force-bar').style.width = this.force + "%";
     }
     
     //Fire bullet
     fire = () => {
         //Ban movement after firing
-        this.allowMove = false;
+        this.allowMoveLeft = false;
+        this.allowMoveRight = false;
+        this.allowForce = false;
         this.lastForce = this.force;
     }
 }
