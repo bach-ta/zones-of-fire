@@ -16,6 +16,8 @@ export default class Player{
         this.rightPressed = false;
         this.allowMoveLeft = true;
         this.allowMoveRight = true;
+        // Flying
+        this.fPressed = false;
         // Arrow
         this.arrow = new Arrow(angle, color);
         this.direction = direction;

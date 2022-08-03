@@ -21,6 +21,9 @@ const handleKeyDown = (e, game) => {
         case 40:                              // If pressed down arrow (v)
             game.players[game.turn].downPressed = true;      
             break;
+        case 70:                              // If pressed down F
+            game.players[game.turn].fPressed = true;      
+            break;
         }
 }
 
