@@ -111,11 +111,8 @@ export default class Game {
   checkMove = () => {
     if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed) {
       this.blockCheck();
-      if (this.players[this.turn].allowMoveLeft || this.players[this.turn].allowMoveRight){
-        this.players[this.turn].move();
-        // Handle player climb
-        this.handlePlayerClimb();
-      }
+      this.players[this.turn].move();
+      this.handlePlayerClimb();
     }
   }
 
