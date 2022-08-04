@@ -18,6 +18,7 @@ export default class Player{
         this.allowMoveRight = true;
         // Flying
         this.fPressed = false;
+        this.allowF = true;
         // Arrow
         this.arrow = new Arrow(angle, color);
         this.direction = direction;
@@ -122,6 +123,7 @@ export default class Player{
         this.allowMoveLeft = false;
         this.allowMoveRight = false;
         this.allowForce = false;
+        this.allowF = false;
         this.lastForce = this.force;
     }
 }

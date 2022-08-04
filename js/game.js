@@ -1,8 +1,8 @@
 import Player, { initPositions } from './player.js';
 import Bullet from './bullet.js';
-import { BACKGROUND, FOREGROUND, WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS, CLIMBING_LIMIT } from './constants.js';
+import { BACKGROUND, FOREGROUND } from './script.js';
+import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS, CLIMBING_LIMIT } from './constants.js';
 import { HealthBar, StaminaBar, TurnArrow } from './supplementaries.js';
-import Border from './border (unused).js';
 
 export const canvas = document.querySelector('#canvas');
 export const context = canvas.getContext('2d');
@@ -30,6 +30,7 @@ export default class Game {
     this.hasFlyingBullet = false;
     this.bulletFlyingTime = 0;
     this.bullet = null;
+    this.bulletType = 'damage';
     this.checkHit = 0;
     this.trackBulletX = [];
     this.trackBulletY = [];
@@ -42,9 +43,9 @@ export default class Game {
   // **********************************************************************
 
   loop = () => {
-    this.frameID = window.requestAnimationFrame(this.loop);
     this.update();
     this.draw();
+    window.requestAnimationFrame(this.loop);
   }
 
   // **********************************************************************
@@ -62,7 +63,7 @@ export default class Game {
     this.checkAngle();
 
     // Check if user pressed/released shooting key or pressed flying key
-    this.checkShootFly();
+    this.checkShoot();
 
     // Check if there is a bullet
     this.checkBullet();
@@ -75,6 +76,7 @@ export default class Game {
   draw = () => {
     // Draw terrain
     this.initTerrain();
+    this.handlePlayerFall();
     context.putImageData(this.imageDataForeground, 0, 0);
 
     // Draw players and arrows
@@ -111,8 +113,7 @@ export default class Game {
       this.blockCheck();
       if (this.players[this.turn].allowMoveLeft || this.players[this.turn].allowMoveRight){
         this.players[this.turn].move();
-        // Handle player fall/climb
-        this.handlePlayerFall();
+        // Handle player climb
         this.handlePlayerClimb();
       }
     }
@@ -124,7 +125,7 @@ export default class Game {
     }
   }
 
-  checkShootFly = () => {
+  checkShoot = () => {
     if (this.players[this.turn].spacePressed && this.players[this.turn].allowForce) {
       this.players[this.turn].changeForce();
     }
@@ -172,9 +173,9 @@ export default class Game {
       this.imageDataBackground = context.getImageData(0, 0, WIDTH, HEIGHT);
     
     context.drawImage(FOREGROUND, 0, 0);
-    if (this.count <= 5) {// TODO: ?
+    if (this.count <= 5) // TODO: ?
       this.imageDataForeground = context.getImageData(0, 0, WIDTH, HEIGHT);
-    }
+
     this.count++;
   }
 
@@ -208,24 +209,27 @@ export default class Game {
   // **********************************
   handleBullet = () => {    
     // Generate bullet only once each time space is pressed
-    let bulletType = 'damage';
-    if (this.players[this.turn].fPressed) bulletType = 'fly';
+    if (this.players[this.turn].fPressed){
+      this.bulletType = 'fly';
+      this.players[this.turn].fPressed = false;
+      this.players[this.turn].allowF = false;
+    }
 
     if (this.bulletFlyingTime === 0) { 
       let bulletStartX = this.players[this.turn].x + ARROW_LENGTH*Math.cos(this.players[this.turn].arrow.angle);
       let bulletStartY = this.players[this.turn].y + ARROW_LENGTH*Math.sin(this.players[this.turn].arrow.angle);
-      this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].arrow.angle, this.players[this.turn].force, BULLET_RADIUS, bulletType);
+      this.bullet = new Bullet(bulletStartX, bulletStartY, this.players[this.turn].arrow.angle, this.players[this.turn].force, BULLET_RADIUS, this.bulletType);
     }
 
     // Flying bullet. Track bullet damage positions 100 times within 1 frame
-    if (bulletType === 'damage'){
+    if (this.bulletType === 'damage'){
       for (let i = 0; i < 100; i++) {
         this.bullet.x += 0.01 * (this.bullet.velocity * Math.cos(this.bullet.bulletAngle));
         this.bullet.y -= 0.01 * ((-this.bullet.velocity * Math.sin(this.bullet.bulletAngle)) - ((1/2 * GRAVITY)*(Math.pow(this.bulletFlyingTime + 1,2) - Math.pow(this.bulletFlyingTime,2))));
         this.trackBulletX[i] = this.bullet.x;
         this.trackBulletY[i] = this.bullet.y;
       }
-      this.bulletFlyingTime += 1;
+      this.bulletFlyingTime++;
       
       // Checks if bullet directly hit the OTHER player. Limit number of times we decrease player health by 1 (this.checkHit)
       if (this.checkDirectHitPlayer() && this.checkHit === 0){
@@ -240,9 +244,9 @@ export default class Game {
 
     // Flying bullet. Track bullet flying positions 50 times within 1 frame
     else{
-      for (let i = 0; i < 50; i++) {
-        this.bullet.x += 0.02 * (this.bullet.velocity * Math.cos(this.bullet.bulletAngle));
-        this.bullet.y -= 0.02 * ((-this.bullet.velocity * Math.sin(this.bullet.bulletAngle)) - ((1/2 * GRAVITY)*(Math.pow(this.bulletFlyingTime + 1,2) - Math.pow(this.bulletFlyingTime,2))));
+      for (let i = 0; i < 100; i++) {
+        this.bullet.x += 0.01 * (this.bullet.velocity * Math.cos(this.bullet.bulletAngle));
+        this.bullet.y -= 0.01 * ((-this.bullet.velocity * Math.sin(this.bullet.bulletAngle)) - ((1/2 * GRAVITY)*(Math.pow(this.bulletFlyingTime + 1,2) - Math.pow(this.bulletFlyingTime,2))));
         this.trackBulletX[i] = this.bullet.x;
         this.trackBulletY[i] = this.bullet.y;
       }
@@ -298,9 +302,7 @@ export default class Game {
       if (this.checkSplashHitPlayer(clashPointX, clashPointY) && this.checkHit === 0){
         this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
       }
-      this.handlePlayerFall();
       this.nextTurn();
-      this.players[this.turn].stamina = MAX_STAMINA;    // Restore stamina for player just received turn
     }
   }
 
@@ -310,47 +312,36 @@ export default class Game {
   
   // TODO: Limit pressing f while shooting
   handleBulletCrashedFly = () => {
-    let clashPointX = 0;
-    let clashPointY = 0;
-    let angleClash = null;
+    let clashCenterX = 0;
+    let clashCenterY = 0;
+    let iClash = null;
 
     // Find first clash point in each bullet circumference
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 100; i++) {
       let centerBulletX = Math.ceil(this.trackBulletX[i]);
       let centerBulletY = Math.ceil(this.trackBulletY[i]);
-
-      for (let angle = 0; angle < Math.PI*2; angle += Math.PI/90){
-        let pointX = centerBulletX + BULLET_RADIUS*Math.cos(angle);
-        let pointY = centerBulletY - BULLET_RADIUS*Math.sin(angle);
-        if (this.getColor(this.imageDataBackground.data, pointX, pointY).toString() !== this.getColor(this.imageDataForeground.data, pointX, pointY).toString()) {
-          clashPointX = pointX;
-          clashPointY = pointY;
-          angleClash = angle;
-          break;
-        }
+      if (this.getColor(this.imageDataBackground.data, centerBulletX, centerBulletY).toString() !== this.getColor(this.imageDataForeground.data, centerBulletX, centerBulletY).toString()){
+        clashCenterX = centerBulletX;
+        clashCenterY = centerBulletY;
+        iClash = i;
+        break;
       }
     }
-    // Teleport player
-    if (angleClash){
-      if (0 < angleClash < Math.PI/2){
-        this.players[this.turn].setX = clashPointX - PLAYER_RADIUS*Math.cos(angleClash);
-        this.players[this.turn].setY = clashPointY + PLAYER_RADIUS*Math.sin(angleClash);
+
+    if (iClash){
+      let currentX;
+      let currentY;
+
+      while (--iClash >= 0){
+        currentX = Math.ceil(this.trackBulletX[iClash]);
+        currentY = Math.ceil(this.trackBulletY[iClash]);
+        let distanceSquared = Math.pow(currentX-clashCenterX,2) + Math.pow(currentY-clashCenterY,2)
+        if (distanceSquared > Math.pow(PLAYER_RADIUS,2)) break;
       }
-      else if (Math.PI/2 <= angleClash < Math.PI){
-        this.players[this.turn].setX = clashPointX + PLAYER_RADIUS*Math.cos(angleClash);
-        this.players[this.turn].setY = clashPointY + PLAYER_RADIUS*Math.sin(angleClash);
-      }
-      else if (Math.PI <= angleClash < Math.PI*3/2){
-        this.players[this.turn].setX = clashPointX + PLAYER_RADIUS*Math.cos(angleClash);
-        this.players[this.turn].setY = clashPointY - PLAYER_RADIUS*Math.sin(angleClash);
-      }
-      else{
-        this.players[this.turn].setX = clashPointX - PLAYER_RADIUS*Math.cos(angleClash);
-        this.players[this.turn].setY = clashPointY - PLAYER_RADIUS*Math.sin(angleClash);
-      }
-      this.handlePlayerFall();
+
+      this.players[this.turn].setX = currentX;
+      this.players[this.turn].setY = currentY - PLAYER_RADIUS;
       this.nextTurn();
-      this.players[this.turn].stamina = MAX_STAMINA;
       return;
     }
   }
@@ -366,7 +357,7 @@ export default class Game {
 
       while (currentY < HEIGHT && this.getColor(this.imageDataForeground.data, currentX, currentY).toString() === this.getColor(this.imageDataBackground.data, currentX, currentY).toString()) {
         currentY++;
-        this.players[i].setY = currentY - PLAYER_RADIUS - 1;
+        this.players[i].setY = currentY - PLAYER_RADIUS;
       }
     }
   }
@@ -377,7 +368,6 @@ export default class Game {
   checkBulletOutCanvas = () => {
     if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT) {
       this.nextTurn();
-      this.players[this.turn].stamina = MAX_STAMINA;      // Restore stamina for player just received turn
       return;
     }
   }
@@ -477,7 +467,9 @@ export default class Game {
     this.players[this.turn].allowMoveLeft = true;
     this.players[this.turn].allowMoveRight = true;
     this.players[this.turn].allowForce = true;
+    this.players[this.turn].allowF = true;
     this.players[this.turn].forceIncrease = true;
+    this.bulletType = 'damage';
     // In case player never released key --> When turn comes back, value of _Pressed would still be true
     this.players[this.turn].spacePressed = false;
     this.players[this.turn].upPressed = false;
@@ -487,6 +479,7 @@ export default class Game {
     this.players[this.turn].fPressed = false;
     // Change turn
     this.turn = (this.turn + 1) % this.numPlayers;
+    this.players[this.turn].stamina = MAX_STAMINA;      // Restore stamina for player just received turn
     document.querySelector('#force-bar').style.width = this.players[this.turn].force + "%"
     document.querySelector('#last-force-bar').style.width = this.players[this.turn].lastForce + "%"
   }

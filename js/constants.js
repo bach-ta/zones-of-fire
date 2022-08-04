@@ -1,11 +1,3 @@
-// Images
-export const BACKGROUND = new Image()
-BACKGROUND.src = '../Finalbackground.png';
-export const FOREGROUND = new Image()
-FOREGROUND.src = '../Finalforeground.png';
-// export const gameover = new Image()
-// gameover.src = '../gameover.png'
-
 // Sizing
 export const WIDTH = 1500;
 export const HEIGHT = 960;
@@ -27,7 +19,7 @@ export const STAMINA_STEP = 0.5;
 export const PLAYER_SPEED = 3;
 export const CLIMBING_LIMIT = PLAYER_RADIUS/2;
 
-// Changing Direction
+// Changing Direction  
 export const DIRECTION_RIGHT = 0;
 export const DIRECTION_LEFT = 1;
 
@@ -35,7 +27,7 @@ export const DIRECTION_LEFT = 1;
 export const GRAVITY = 0.6;
 export const FORCE_STEP = 0.5;
 export const MAX_HEALTH = HEALTH_BAR_WIDTH;
-export const DAMAGE = 20;
+export const DAMAGE = 25;
 
 // Angle
 export const MIN_ANGLE = -Math.PI * 5 / 12;

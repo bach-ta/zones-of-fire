@@ -1,3 +1,4 @@
+import { MAX_STAMINA } from './constants.js';
 import Game from './game.js';
 
 // **********************************************************************
@@ -22,7 +23,10 @@ const handleKeyDown = (e, game) => {
             game.players[game.turn].downPressed = true;      
             break;
         case 70:                              // If pressed down F
-            game.players[game.turn].fPressed = true;      
+            if (game.players[game.turn].allowF && game.players[game.turn].stamina >= MAX_STAMINA/2){
+                game.players[game.turn].fPressed = true;
+                game.players[game.turn].stamina -= MAX_STAMINA/2;
+            }
             break;
         }
 }
@@ -53,6 +57,14 @@ export const enableEventListener = (game) => {
     document.addEventListener('keyup', (e) => {handleKeyUp(e, game)});
 }
 
-let game = new Game();
-enableEventListener(game);
-game.loop();
+export const BACKGROUND = new Image()
+BACKGROUND.src = '../Finalbackground.png';
+export const FOREGROUND = new Image()
+FOREGROUND.src = '../Finalforeground.png';
+
+window.onload = () => {
+    let game = new Game();
+    enableEventListener(game);
+    game.loop();
+}
+
