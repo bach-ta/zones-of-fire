@@ -57,10 +57,6 @@ export const enableEventListener = (game) => {
     document.addEventListener('keyup', (e) => {handleKeyUp(e, game)});
 }
 
-export const BACKGROUND = new Image()
-BACKGROUND.src = '../Finalbackground.png';
-export const FOREGROUND = new Image()
-FOREGROUND.src = '../Finalforeground.png';
 
 window.onload = () => {
     let game = new Game();
@@ -68,3 +64,4 @@ window.onload = () => {
     game.loop();
 }
 
+// window.onresize = () => { resizeCanvas(); }

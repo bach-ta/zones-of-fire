@@ -7,10 +7,6 @@ body{
     /* background-color: bisque; */
 }
 
-#game-title {
-    text-align: center;
-}
-
 #canvas{
     border: 4px solid grey;
     position: absolute;

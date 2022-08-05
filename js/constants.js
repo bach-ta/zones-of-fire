@@ -1,22 +1,39 @@
+// Canvas, context
+export const canvas = document.querySelector('#canvas');
+export const context = canvas.getContext('2d');
+
+// Images
+export const BACKGROUND = new Image()
+BACKGROUND.src = '../Finalbackground.png';
+export const FOREGROUND = new Image()
+FOREGROUND.src = '../Finalforeground.png';
+
 // Sizing
-export const WIDTH = 1500;
-export const HEIGHT = 960;
-export const PLAYER_RADIUS = 20;
-export const BULLET_RADIUS = 5;
+const WIDTH_HEIGHT_RATIO = 2;
+export const resizeCanvas = () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    if (canvas.height < canvas.width / WIDTH_HEIGHT_RATIO) canvas.width = canvas.height * WIDTH_HEIGHT_RATIO;
+    else canvas.height = canvas.width / WIDTH_HEIGHT_RATIO;
+}
+resizeCanvas();
+
+export const PLAYER_RADIUS = Math.sqrt(canvas.width*canvas.height*0.0006/Math.PI);
+export const BULLET_RADIUS = PLAYER_RADIUS/4;
 export const ARROW_LENGTH = PLAYER_RADIUS * 2;
-export const ARROW_WIDTH = 10;
-export const HEALTH_BAR_HEIGHT = 10;
-export const HEALTH_BAR_WIDTH = 50;
-export const STAMINA_BAR_HEIGHT = 10;
-export const STAMINA_BAR_WIDTH = 50;
-export const INIT_PLAYER_X = 200;
-export const INIT_PLAYER_Y = HEIGHT/3*2 - PLAYER_RADIUS*2;
+export const ARROW_WIDTH = PLAYER_RADIUS/2;
+export const HEALTH_BAR_HEIGHT = PLAYER_RADIUS/2;
+export const HEALTH_BAR_WIDTH = PLAYER_RADIUS*5/2;
+export const STAMINA_BAR_HEIGHT = PLAYER_RADIUS/2;
+export const STAMINA_BAR_WIDTH = PLAYER_RADIUS*5/2;
+export const INIT_PLAYER_X = canvas.width/10;
+export const INIT_PLAYER_Y = canvas.height/2 - PLAYER_RADIUS*2;
 export const SPLASH_RADIUS = BULLET_RADIUS * 10;
 
 // Moving
 export const MAX_STAMINA = STAMINA_BAR_WIDTH;
-export const STAMINA_STEP = 0.5;
-export const PLAYER_SPEED = 3;
+export const STAMINA_STEP = MAX_STAMINA/100;
+export const PLAYER_SPEED = PLAYER_RADIUS/5;
 export const CLIMBING_LIMIT = PLAYER_RADIUS/2;
 
 // Changing Direction  
@@ -24,10 +41,10 @@ export const DIRECTION_RIGHT = 0;
 export const DIRECTION_LEFT = 1;
 
 // Shooting
-export const GRAVITY = 0.6;
+export const GRAVITY = PLAYER_RADIUS/40;
 export const FORCE_STEP = 0.5;
 export const MAX_HEALTH = HEALTH_BAR_WIDTH;
-export const DAMAGE = 25;
+export const DAMAGE = MAX_HEALTH/5;
 
 // Angle
 export const MIN_ANGLE = -Math.PI * 5 / 12;

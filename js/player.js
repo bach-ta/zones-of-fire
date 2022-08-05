@@ -1,6 +1,5 @@
 import { Arrow } from './supplementaries.js';
-import { HEIGHT, WIDTH, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y, STAMINA_STEP } from './constants.js';
-import { context } from './game.js';
+import { canvas, context, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y, STAMINA_STEP } from './constants.js';
 
 // Player Objects
 export default class Player{
@@ -85,7 +84,7 @@ export default class Player{
         return changed;
     }
 
-    //Change angle
+    // Change angle
     changeAngle = () => {
         let newAngle = 0;
         if (this.upPressed) newAngle = this.arrow.angle + (Math.PI/90) * (2 * this.direction - 1);
@@ -100,7 +99,7 @@ export default class Player{
                     (Math.PI - angle >= MIN_ANGLE && Math.PI - angle <= MAX_ANGLE);
     }
     
-    //Niệm chiêu. Max = 100
+    // Increase Force. Max = 100
     changeForce = () => {
         if (this.force >= 100){
             this.forceIncrease = false;
@@ -117,9 +116,9 @@ export default class Player{
         document.querySelector('#force-bar').style.width = this.force + "%";
     }
     
-    //Fire bullet
+    // Fire bullet
     fire = () => {
-        //Ban movement after firing
+        // Ban movement after firing
         this.allowMoveLeft = false;
         this.allowMoveRight = false;
         this.allowForce = false;
@@ -129,10 +128,10 @@ export default class Player{
 }
 
 // Initialize player positions
-export const initPositions = (terrain) => {
+export const initPositions = () => {
     let x1 = INIT_PLAYER_X;
     let y1 = INIT_PLAYER_Y;
-    let x2 = WIDTH-INIT_PLAYER_X;
+    let x2 = canvas.width-INIT_PLAYER_X;
     let y2 = INIT_PLAYER_Y;
 
     return [x1, y1, x2, y2];

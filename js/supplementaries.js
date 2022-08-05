@@ -1,5 +1,5 @@
 import { ARROW_LENGTH, ARROW_WIDTH, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, MAX_HEALTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, PLAYER_RADIUS } from "./constants.js";
-import { context } from "./game.js";
+import { context } from './constants.js';
 
 // **********************************************************************
 // Player Arrow
@@ -39,7 +39,7 @@ export class HealthBar {
 
     drawHealth = () => {
         context.strokeStyle = "#333";
-        context.lineWidth = 3;
+        context.lineWidth = PLAYER_RADIUS*3/20;
         context.fillStyle = this.color;
         context.fillRect(this.x, this.y, this.health, this.height);
         context.strokeRect(this.x, this.y, this.width, this.height);
@@ -62,7 +62,7 @@ export class StaminaBar {
 
     drawStamina = () => { 
         context.strokeStyle = "#333";
-        context.lineWidth = 3;
+        context.lineWidth = PLAYER_RADIUS*3/20;
         context.fillStyle = this.color;
         context.fillRect(this.x, this.y, this.stamina, this.height);
         context.strokeRect(this.x, this.y, this.width, this.height);
@@ -82,7 +82,6 @@ export class TurnArrow{
 
     drawTurnArrow = () => {
         context.fillStyle = this.color;
-        context.lineWidth = 2;
         context.beginPath();
         context.moveTo(this.x - PLAYER_RADIUS, this.y - PLAYER_RADIUS*5);
         context.lineTo(this.x + PLAYER_RADIUS, this.y - PLAYER_RADIUS*5);

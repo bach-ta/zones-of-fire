@@ -1,4 +1,4 @@
-import { context } from './game.js';
+import { context } from './constants.js';
 
 export default class Bullet {
     constructor(x, y, bulletAngle, velocity, radius, type='damage') {

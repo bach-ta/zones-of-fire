@@ -1,12 +1,8 @@
 import Player, { initPositions } from './player.js';
 import Bullet from './bullet.js';
-import { BACKGROUND, FOREGROUND } from './script.js';
-import { WIDTH, HEIGHT, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS, CLIMBING_LIMIT } from './constants.js';
+import { BACKGROUND, FOREGROUND, canvas, context } from './constants.js';
+import { PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS, CLIMBING_LIMIT } from './constants.js';
 import { HealthBar, StaminaBar, TurnArrow } from './supplementaries.js';
-
-export const canvas = document.querySelector('#canvas');
-export const context = canvas.getContext('2d');
-
 export default class Game {
   /**********************************************************************
   // Construct the intial states of the game
@@ -22,8 +18,7 @@ export default class Game {
 
   restart = () => {
     // Game objects
-    this.terrain = BACKGROUND;
-    this.players = this.createPlayers(this.terrain);
+    this.players = this.createPlayers();
     this.count = 0;
     // Game states
     this.turn = 0;
@@ -111,11 +106,8 @@ export default class Game {
   checkMove = () => {
     if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed) {
       this.blockCheck();
-      if (this.players[this.turn].allowMoveLeft || this.players[this.turn].allowMoveRight){
-        this.players[this.turn].move();
-        // Handle player climb
-        this.handlePlayerClimb();
-      }
+      this.players[this.turn].move();
+      this.handlePlayerClimb();
     }
   }
 
@@ -144,14 +136,14 @@ export default class Game {
 
   checkWinner = () => {
     // Check if both player fell down
-    if (this.players.every( (player) => player.y + PLAYER_RADIUS + 1 === HEIGHT)){
+    if (this.players.every( (player) => player.y + PLAYER_RADIUS === canvas.height)){
       alert("It's a tie!");
       this.restart();
 
     }
     else{
       for (let i = 0; i < this.players.length; i++){
-        if (this.players[i].health === 0 || this.players[i].y + PLAYER_RADIUS + 1 === HEIGHT){
+        if (this.players[i].health === 0 || this.players[i].y + PLAYER_RADIUS === canvas.height){
           alert(`Player ${this.players[(i + 1) % this.numPlayers].color} wins!`)
           this.restart();
         }
@@ -168,14 +160,13 @@ export default class Game {
   // Background and foreground initialization, get & set
   // **********************************
   initTerrain = () => {
-    context.drawImage(BACKGROUND, 0, 0);
-    if (this.count <= 5) // TODO: ?
-      this.imageDataBackground = context.getImageData(0, 0, WIDTH, HEIGHT);
     
-    context.drawImage(FOREGROUND, 0, 0);
-    if (this.count <= 5) // TODO: ?
-      this.imageDataForeground = context.getImageData(0, 0, WIDTH, HEIGHT);
-
+    if (this.count <= 5){ // TODO: ?
+      context.drawImage(BACKGROUND, 0, 0, canvas.width, canvas.height);
+      this.imageDataBackground = context.getImageData(0, 0, canvas.width, canvas.height);
+      context.drawImage(FOREGROUND, 0, 0, canvas.width, canvas.height);
+      this.imageDataForeground = context.getImageData(0, 0, canvas.width, canvas.height);
+    }
     this.count++;
   }
 
@@ -197,7 +188,7 @@ export default class Game {
   // Create players
   // **********************************
   createPlayers = () => {
-    const [x1, y1, x2, y2] = initPositions(this.terrain);
+    const [x1, y1, x2, y2] = initPositions();
     const player1 = new Player(x1, y1, "red", INITIAL_ANGLE, DIRECTION_RIGHT);
     const player2 = new Player(x2, y2, "blue", Math.PI - INITIAL_ANGLE, DIRECTION_LEFT);
     return [player1, player2];
@@ -225,7 +216,7 @@ export default class Game {
     if (this.bulletType === 'damage'){
       for (let i = 0; i < 100; i++) {
         this.bullet.x += 0.01 * (this.bullet.velocity * Math.cos(this.bullet.bulletAngle));
-        this.bullet.y -= 0.01 * ((-this.bullet.velocity * Math.sin(this.bullet.bulletAngle)) - ((1/2 * GRAVITY)*(Math.pow(this.bulletFlyingTime + 1,2) - Math.pow(this.bulletFlyingTime,2))));
+        this.bullet.y -= 0.01 * ((-this.bullet.velocity * Math.sin(this.bullet.bulletAngle)) - ((1/2 * GRAVITY)*(Math.pow(this.bulletFlyingTime+1,2) - Math.pow(this.bulletFlyingTime,2))));
         this.trackBulletX[i] = this.bullet.x;
         this.trackBulletY[i] = this.bullet.y;
       }
@@ -285,23 +276,21 @@ export default class Game {
         for (let j = 0; j < SPLASH_RADIUS; j++) {
           for (let k = 0; k < 4; k++) {
             let distance = Math.sqrt(Math.pow(i, 2) + Math.pow(j, 2));
-            if (clashPointX + i*SIGN_X[k] >= 0 && clashPointX + i*SIGN_X[k] < WIDTH &&
-                clashPointY + j*SIGN_Y[k] >= 0 && clashPointY + j*SIGN_Y[k] < HEIGHT &&
+            if (clashPointX + i*SIGN_X[k] >= 0 && clashPointX + i*SIGN_X[k] < canvas.width &&
+                clashPointY + j*SIGN_Y[k] >= 0 && clashPointY + j*SIGN_Y[k] < canvas.height &&
                 distance < SPLASH_RADIUS) {
               let backgroundPixelColor = this.getColor(this.imageDataBackground.data, clashPointX + i*SIGN_X[k], clashPointY + j*SIGN_Y[k]);
-              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4] = backgroundPixelColor[0];
-              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4 + 1] = backgroundPixelColor[1];
-              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4 + 2] = backgroundPixelColor[2];
-              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * WIDTH + clashPointX + i*SIGN_X[k])*4 + 3] = backgroundPixelColor[3];
+              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * canvas.width + clashPointX + i*SIGN_X[k])*4] = backgroundPixelColor[0];
+              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * canvas.width + clashPointX + i*SIGN_X[k])*4 + 1] = backgroundPixelColor[1];
+              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * canvas.width + clashPointX + i*SIGN_X[k])*4 + 2] = backgroundPixelColor[2];
+              tempImageDataForeground.data[((clashPointY + j*SIGN_Y[k]) * canvas.width + clashPointX + i*SIGN_X[k])*4 + 3] = backgroundPixelColor[3];
             }
           }
         }
       }
       this.imageDataForeground = tempImageDataForeground;
       // Checks if bullet splash hit the OTHER player
-      if (this.checkSplashHitPlayer(clashPointX, clashPointY) && this.checkHit === 0){
-        this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
-      }
+      if (this.checkSplashHitPlayer(clashPointX, clashPointY) && this.checkHit === 0) this.decreaseHealth(this.players[(this.turn + 1) % this.numPlayers]);
       this.nextTurn();
     }
   }
@@ -353,9 +342,9 @@ export default class Game {
     for (let i = 0; i < this.players.length; i++) {
       let currentPlayer = this.players[i];
       let currentX = Math.ceil(currentPlayer.getX);
-      let currentY = Math.ceil(currentPlayer.getY + PLAYER_RADIUS + 1);
+      let currentY = Math.ceil(currentPlayer.getY + PLAYER_RADIUS);
 
-      while (currentY < HEIGHT && this.getColor(this.imageDataForeground.data, currentX, currentY).toString() === this.getColor(this.imageDataBackground.data, currentX, currentY).toString()) {
+      while (currentY < canvas.height && this.getColor(this.imageDataForeground.data, currentX, currentY).toString() === this.getColor(this.imageDataBackground.data, currentX, currentY).toString()) {
         currentY++;
         this.players[i].setY = currentY - PLAYER_RADIUS;
       }
@@ -366,7 +355,7 @@ export default class Game {
   // Change turn if bullet goes out of canvas (except for top side)
   // **********************************
   checkBulletOutCanvas = () => {
-    if (this.bullet.x > WIDTH || this.bullet.x < 0 || this.bullet.y > HEIGHT) {
+    if (this.bullet.x > canvas.width || this.bullet.x < 0 || this.bullet.y > canvas.height) {
       this.nextTurn();
       return;
     }
@@ -426,16 +415,16 @@ export default class Game {
   blockCheck = () => {
     let currentPlayer = this.players[this.turn];
     let currentX = Math.ceil(currentPlayer.getX);
-    let currentY = Math.ceil(currentPlayer.getY + PLAYER_RADIUS + 1);
+    let currentY = Math.ceil(currentPlayer.getY);
     // Map boundaries
-    if (this.players[this.turn].x < PLAYER_RADIUS) currentPlayer.allowMoveLeft = false;
-    if (this.players[this.turn].x > WIDTH - PLAYER_RADIUS) currentPlayer.allowMoveRight = false;
+    if (currentX < PLAYER_RADIUS) currentPlayer.allowMoveLeft = false;
+    if (currentX > canvas.width - PLAYER_RADIUS) currentPlayer.allowMoveRight = false;
     // Cannot climb
     for (let i = 0; i < CLIMBING_LIMIT; i++){
-      if (this.getColor(this.imageDataForeground.data, currentX + PLAYER_RADIUS, currentY-PLAYER_RADIUS-i).toString() !== this.getColor(this.imageDataBackground.data, currentX + PLAYER_RADIUS, currentY-PLAYER_RADIUS-i).toString()){
+      if (this.getColor(this.imageDataForeground.data, currentX + PLAYER_RADIUS + 1, currentY-i).toString() !== this.getColor(this.imageDataBackground.data, currentX + PLAYER_RADIUS + 1, currentY-i).toString()){
         currentPlayer.allowMoveRight = false;
       }
-      if (this.getColor(this.imageDataForeground.data, currentX - PLAYER_RADIUS, currentY-PLAYER_RADIUS-i).toString() !== this.getColor(this.imageDataBackground.data, currentX - PLAYER_RADIUS, currentY-PLAYER_RADIUS-i).toString()){
+      if (this.getColor(this.imageDataForeground.data, currentX - PLAYER_RADIUS - 1, currentY-i).toString() !== this.getColor(this.imageDataBackground.data, currentX - PLAYER_RADIUS - 1, currentY-i).toString()){
         currentPlayer.allowMoveLeft = false;
       }
     }
@@ -446,10 +435,10 @@ export default class Game {
   // **********************************
   getColor = (imageData, x, y) => {
     const _rgba = [];
-    _rgba.push(imageData[(y * WIDTH + x) * 4])
-    _rgba.push(imageData[(y * WIDTH + x) * 4+1])
-    _rgba.push(imageData[(y * WIDTH + x) * 4+2])
-    _rgba.push(imageData[(y * WIDTH + x) * 4+3])
+    _rgba.push(imageData[(y * canvas.width + x) * 4])
+    _rgba.push(imageData[(y * canvas.width + x) * 4+1])
+    _rgba.push(imageData[(y * canvas.width + x) * 4+2])
+    _rgba.push(imageData[(y * canvas.width + x) * 4+3])
     return _rgba;
   }
 
