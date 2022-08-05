@@ -38,8 +38,10 @@ export class HealthBar {
     }
 
     drawHealth = () => {
-        context.strokeStyle = "#333";
-        context.lineWidth = PLAYER_RADIUS*3/20;
+        context.strokeStyle = "white";
+        context.lineWidth = PLAYER_RADIUS*1/20;
+        context.fillStyle = "white";
+        context.fillRect(this.x, this.y, this.width, this.height);
         context.fillStyle = this.color;
         context.fillRect(this.x, this.y, this.health, this.height);
         context.strokeRect(this.x, this.y, this.width, this.height);
@@ -61,8 +63,10 @@ export class StaminaBar {
     }
 
     drawStamina = () => { 
-        context.strokeStyle = "#333";
-        context.lineWidth = PLAYER_RADIUS*3/20;
+        context.strokeStyle = "white";
+        context.lineWidth = PLAYER_RADIUS*1/20;
+        context.fillStyle = "black";
+        context.fillRect(this.x, this.y, this.width, this.height);
         context.fillStyle = this.color;
         context.fillRect(this.x, this.y, this.stamina, this.height);
         context.strokeRect(this.x, this.y, this.width, this.height);
@@ -83,9 +87,9 @@ export class TurnArrow{
     drawTurnArrow = () => {
         context.fillStyle = this.color;
         context.beginPath();
-        context.moveTo(this.x - PLAYER_RADIUS, this.y - PLAYER_RADIUS*5);
-        context.lineTo(this.x + PLAYER_RADIUS, this.y - PLAYER_RADIUS*5);
-        context.lineTo(this.x, this.y - PLAYER_RADIUS*4);
+        context.moveTo(this.x - PLAYER_RADIUS, this.y - PLAYER_RADIUS*4);
+        context.lineTo(this.x + PLAYER_RADIUS, this.y - PLAYER_RADIUS*4);
+        context.lineTo(this.x, this.y - PLAYER_RADIUS*3);
         context.closePath();
         context.fill();
     }

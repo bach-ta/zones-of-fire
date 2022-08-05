@@ -4,15 +4,15 @@ export const context = canvas.getContext('2d');
 
 // Images
 export const BACKGROUND = new Image()
-BACKGROUND.src = '../Finalbackground.png';
+BACKGROUND.src = '../images/Finalbackground.png';
 export const FOREGROUND = new Image()
-FOREGROUND.src = '../Finalforeground.png';
+FOREGROUND.src = '../images/Finalforeground.png';
 
 // Sizing
 const WIDTH_HEIGHT_RATIO = 2;
 export const resizeCanvas = () => {
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight + 20;
     if (canvas.height < canvas.width / WIDTH_HEIGHT_RATIO) canvas.width = canvas.height * WIDTH_HEIGHT_RATIO;
     else canvas.height = canvas.width / WIDTH_HEIGHT_RATIO;
 }
@@ -22,9 +22,9 @@ export const PLAYER_RADIUS = Math.sqrt(canvas.width*canvas.height*0.0006/Math.PI
 export const BULLET_RADIUS = PLAYER_RADIUS/4;
 export const ARROW_LENGTH = PLAYER_RADIUS * 2;
 export const ARROW_WIDTH = PLAYER_RADIUS/2;
-export const HEALTH_BAR_HEIGHT = PLAYER_RADIUS/2;
-export const HEALTH_BAR_WIDTH = PLAYER_RADIUS*5/2;
-export const STAMINA_BAR_HEIGHT = PLAYER_RADIUS/2;
+export const HEALTH_BAR_HEIGHT = PLAYER_RADIUS/2.5;
+export const HEALTH_BAR_WIDTH = PLAYER_RADIUS*2.5;
+export const STAMINA_BAR_HEIGHT = PLAYER_RADIUS/5;
 export const STAMINA_BAR_WIDTH = PLAYER_RADIUS*5/2;
 export const INIT_PLAYER_X = canvas.width/10;
 export const INIT_PLAYER_Y = canvas.height/2 - PLAYER_RADIUS*2;

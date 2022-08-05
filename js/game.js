@@ -27,6 +27,7 @@ export default class Game {
     this.bullet = null;
     this.bulletType = 'damage';
     this.checkHit = 0;
+    this.checkF = 0;
     this.trackBulletX = [];
     this.trackBulletY = [];
     this.trackFlyX = [];
@@ -84,14 +85,15 @@ export default class Game {
     let turnArrow = new TurnArrow(this.players[this.turn].x, this.players[this.turn].y);
     turnArrow.drawTurnArrow();
 
-    // Draw health bars and stamina bars.
+    // Draw health bars for both players
     for (let i = 0; i < this.players.length; i++) {
-      let healthbar = new HealthBar(this.players[i].x - HEALTH_BAR_WIDTH/2, this.players[i].y - PLAYER_RADIUS*2 - HEALTH_BAR_HEIGHT*2, this.players[i].health, "green");
+      let healthbar = new HealthBar(this.players[i].x - HEALTH_BAR_WIDTH/2, this.players[i].y + PLAYER_RADIUS*2 - HEALTH_BAR_HEIGHT, this.players[i].health, "red");
       healthbar.drawHealth();
-
-      let staminabar = new StaminaBar(this.players[i].x - STAMINA_BAR_WIDTH/2, this.players[i].y + PLAYER_RADIUS + STAMINA_BAR_HEIGHT, this.players[i].stamina, "lightblue");
-      staminabar.drawStamina();
     }
+
+    // Draw stamina bar for player this turn
+    let staminabar = new StaminaBar(this.players[this.turn].x - STAMINA_BAR_WIDTH/2, this.players[this.turn].y + PLAYER_RADIUS*3, this.players[this.turn].stamina, "green");
+      staminabar.drawStamina();
 
     // Draw bullet if exists
     if (this.hasFlyingBullet) {
@@ -458,6 +460,7 @@ export default class Game {
     this.players[this.turn].allowForce = true;
     this.players[this.turn].allowF = true;
     this.players[this.turn].forceIncrease = true;
+    this.players[this.turn].checkF = 0;
     this.bulletType = 'damage';
     // In case player never released key --> When turn comes back, value of _Pressed would still be true
     this.players[this.turn].spacePressed = false;
@@ -471,5 +474,7 @@ export default class Game {
     this.players[this.turn].stamina = MAX_STAMINA;      // Restore stamina for player just received turn
     document.querySelector('#force-bar').style.width = this.players[this.turn].force + "%"
     document.querySelector('#last-force-bar').style.width = this.players[this.turn].lastForce + "%"
+    document.getElementById('flying-icon').style.display='none';
+    document.getElementById('no-flying-icon').style.display='none';
   }
 }
