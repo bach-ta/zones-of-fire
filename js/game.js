@@ -423,10 +423,10 @@ export default class Game {
     if (currentX > canvas.width - PLAYER_RADIUS) currentPlayer.allowMoveRight = false;
     // Cannot climb
     for (let i = 0; i < CLIMBING_LIMIT; i++){
-      if (this.getColor(this.imageDataForeground.data, currentX + PLAYER_RADIUS + 1, currentY-i).toString() !== this.getColor(this.imageDataBackground.data, currentX + PLAYER_RADIUS + 1, currentY-i).toString()){
+      if (this.getColor(this.imageDataForeground.data, Math.ceil(currentX + PLAYER_RADIUS + 1), currentY-i).toString() !== this.getColor(this.imageDataBackground.data, Math.ceil(currentX + PLAYER_RADIUS + 1), currentY-i).toString()){
         currentPlayer.allowMoveRight = false;
       }
-      if (this.getColor(this.imageDataForeground.data, currentX - PLAYER_RADIUS - 1, currentY-i).toString() !== this.getColor(this.imageDataBackground.data, currentX - PLAYER_RADIUS - 1, currentY-i).toString()){
+      if (this.getColor(this.imageDataForeground.data, Math.ceil(currentX - PLAYER_RADIUS - 1), currentY-i).toString() !== this.getColor(this.imageDataBackground.data, Math.ceil(currentX - PLAYER_RADIUS - 1), currentY-i).toString()){
         currentPlayer.allowMoveLeft = false;
       }
     }
