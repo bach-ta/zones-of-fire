@@ -42,8 +42,8 @@ export const DIRECTION_LEFT = 1;
 
 // Shooting
 export const GRAVITY = PLAYER_RADIUS/40;
-export const MAX_FORCE = 100;
-export const FORCE_STEP = 0.5;
+export const MAX_FORCE = 50;
+export const FORCE_STEP = 0.25;
 export const MAX_HEALTH = HEALTH_BAR_WIDTH;
 export const DAMAGE = MAX_HEALTH/5;
 

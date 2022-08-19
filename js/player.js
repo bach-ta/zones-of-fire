@@ -113,7 +113,7 @@ export default class Player{
         else{
             this.force -= FORCE_STEP;
         }
-        document.querySelector('#force-bar').style.width = this.force + "%";
+        document.querySelector('#force-bar').style.width = this.force * 100 / MAX_FORCE + "%";
     }
     
     // Fire bullet
