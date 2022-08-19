@@ -34,6 +34,7 @@ export default class Game {
     this.trackFlyX = [];
     this.trackFlyY = [];
     
+    document.querySelector('#force-bar').style.width = "0%";
     document.querySelector('#last-force-bar').style.width = "0%";
   }
   
