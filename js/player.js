@@ -1,5 +1,5 @@
 import { Arrow } from './supplementaries.js';
-import { canvas, context, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y, STAMINA_STEP } from './constants.js';
+import { canvas, context, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y, STAMINA_STEP, MAX_FORCE } from './constants.js';
 
 // Player Objects
 export default class Player{
@@ -100,9 +100,8 @@ export default class Player{
                     (Math.PI - angle >= MIN_ANGLE && Math.PI - angle <= MAX_ANGLE);
     }
     
-    // Increase Force. Max = 100
     changeForce = () => {
-        if (this.force >= 100){
+        if (this.force >= MAX_FORCE){
             this.forceIncrease = false;
         }
         if (this.force <= 0){

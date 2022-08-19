@@ -1,8 +1,9 @@
 import Player, { initPositions } from './player.js';
 import Bullet from './bullet.js';
-import { BACKGROUND, FOREGROUND, canvas, context } from './constants.js';
+import { BACKGROUND, FOREGROUND, canvas, context, MAX_FORCE } from './constants.js';
 import { PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS, CLIMBING_LIMIT } from './constants.js';
 import { HealthBar, StaminaBar, TurnArrow } from './supplementaries.js';
+
 export default class Game {
   /**********************************************************************
   // Construct the intial states of the game
@@ -32,6 +33,8 @@ export default class Game {
     this.trackBulletY = [];
     this.trackFlyX = [];
     this.trackFlyY = [];
+    
+    document.querySelector('#last-force-bar').style.width = "0%";
   }
   
   // **********************************************************************
@@ -171,20 +174,6 @@ export default class Game {
     }
     this.count++;
   }
-
-  get getBackground() {
-    return this.imageDataBackground
-  }
-  set setBackground(newBackground) {
-    this.imageDataBackground = newBackground;
-  }
-  
-  get getForeground() {
-    return this.imageDataForeground
-  }
-  set setForeground(newForeground) {
-    this.imageDataForeground = newForeground;
-  }
   
   // **********************************
   // Create players
@@ -269,7 +258,7 @@ export default class Game {
         break;
       }
     }
-    let tempImageDataForeground = this.getForeground;
+    let tempImageDataForeground = this.imageDataForeground;
     const SIGN_X = [1, -1, 1, -1];
     const SIGN_Y = [1, 1, -1, -1];
     // Handle clash
@@ -472,8 +461,8 @@ export default class Game {
     // Change turn
     this.turn = (this.turn + 1) % this.numPlayers;
     this.players[this.turn].stamina = MAX_STAMINA;      // Restore stamina for player just received turn
-    document.querySelector('#force-bar').style.width = this.players[this.turn].force + "%"
-    document.querySelector('#last-force-bar').style.width = this.players[this.turn].lastForce + "%"
+    document.querySelector('#force-bar').style.width = this.players[this.turn].force * 100 / MAX_FORCE + "%"
+    document.querySelector('#last-force-bar').style.width = this.players[this.turn].lastForce * 100 / MAX_FORCE + "%"
     document.getElementById('flying-icon').style.display='none';
     document.getElementById('no-flying-icon').style.display='none';
   }

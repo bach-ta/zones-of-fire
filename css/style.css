@@ -1,13 +1,13 @@
-*{
+* {
     box-sizing:border-box;
 }
 
-body{
+body {
     overflow: hidden;       /*Hide scrollbars when moving characters*/
     /* background-color: bisque; */
 }
 
-#canvas{
+#canvas {
     position: absolute;
     top: 0;
     bottom: 0;
