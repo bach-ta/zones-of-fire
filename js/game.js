@@ -19,7 +19,7 @@ export default class Game {
 
   restart = () => {
     // Game objects
-    this.players = this.createPlayers();
+    this.players;
     this.count = 0;
     // Game states
     this.turn = 0;
@@ -43,7 +43,7 @@ export default class Game {
   // **********************************************************************
 
   loop = () => {
-    this.update();
+    //this.update();
     this.draw();
     window.requestAnimationFrame(this.loop);
   }
@@ -54,7 +54,7 @@ export default class Game {
 
   update = () => {
     // Check if there is a winner
-    this.checkWinner();
+    // this.checkWinner();
 
     //Check if user moved
     this.checkMove();
@@ -76,28 +76,34 @@ export default class Game {
   draw = () => {
     // Draw terrain
     this.initTerrain();
-    this.handlePlayerFall();
+    //this.handlePlayerFall();
     context.putImageData(this.imageDataForeground, 0, 0);
 
     // Draw players and arrows
-    for (let i = 0; i < this.players.length; i++) {
-      this.players[i].drawPlayer();
-      this.players[i].arrow.drawArrow(this.players[i]); 
+    for (let i = 0; i < this.players.length; i++){
+      let current = this.players[i];
+      context.fillStyle = current.color;
+      context.beginPath();
+      context.arc(current.x, current.y, PLAYER_RADIUS, 0, Math.PI*2);
+      context.fill();
     }
+    // for (let i = 0; i < this.players.length; i++) {
+    //   this.players[i].arrow.drawArrow(this.players[i]); 
+    // }
 
-    // Draw turn arrow
-    let turnArrow = new TurnArrow(this.players[this.turn].x, this.players[this.turn].y);
-    turnArrow.drawTurnArrow();
+    // // Draw turn arrow
+    // let turnArrow = new TurnArrow(this.players[this.turn].x, this.players[this.turn].y);
+    // turnArrow.drawTurnArrow();
 
-    // Draw health bars for both players
-    for (let i = 0; i < this.players.length; i++) {
-      let healthbar = new HealthBar(this.players[i].x - HEALTH_BAR_WIDTH/2, this.players[i].y + PLAYER_RADIUS*2 - HEALTH_BAR_HEIGHT, this.players[i].health, "red");
-      healthbar.drawHealth();
-    }
+    // // Draw health bars for both players
+    // for (let i = 0; i < this.players.length; i++) {
+    //   let healthbar = new HealthBar(this.players[i].x - HEALTH_BAR_WIDTH/2, this.players[i].y + PLAYER_RADIUS*2 - HEALTH_BAR_HEIGHT, this.players[i].health, "red");
+    //   healthbar.drawHealth();
+    // }
 
-    // Draw stamina bar for player this turn
-    let staminabar = new StaminaBar(this.players[this.turn].x - STAMINA_BAR_WIDTH/2, this.players[this.turn].y + PLAYER_RADIUS*3, this.players[this.turn].stamina, "green");
-      staminabar.drawStamina();
+    // // Draw stamina bar for player this turn
+    // let staminabar = new StaminaBar(this.players[this.turn].x - STAMINA_BAR_WIDTH/2, this.players[this.turn].y + PLAYER_RADIUS*3, this.players[this.turn].stamina, "green");
+    //   staminabar.drawStamina();
 
     // Draw bullet if exists
     if (this.hasFlyingBullet) {
@@ -111,9 +117,10 @@ export default class Game {
 
   checkMove = () => {
     if (this.players[this.turn].leftPressed || this.players[this.turn].rightPressed) {
-      this.blockCheck();
-      this.players[this.turn].move();
-      this.handlePlayerClimb();
+      //this.blockCheck();
+      //this.players[this.turn].move();
+      this.players[this.turn].x -= 10;
+      //this.handlePlayerClimb();
     }
   }
 

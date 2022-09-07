@@ -56,8 +56,7 @@ export default class Player{
         context.fill();
     }
     
-    // Move Player 
-    // TODO: Player move with terrain boundaries
+    // Move Player
     move = () => {
         if (this.changeDirection()) return;
         if (this.stamina > 0) {

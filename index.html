@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zones of Fire</title>
-    <link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
     <link rel="icon" href="./tilesets/Magic Cliffs/Magic-Cliffs-Environment/PREVIEWS/100x100x1.png">
 
 </head>
@@ -17,7 +17,24 @@
     <img id="flying-icon" src="./images/flying.png" style="display:none"></img>
     <img id="no-flying-icon" src="./images/no-flying.png" style="display:none"></img>
     <canvas id="canvas"></canvas>
+
     <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAcT6NHT4Vr_4lnTDn2yM8sMM-At2Nhjp4",
+            authDomain: "zones-of-fire-3635a.firebaseapp.com",
+            databaseURL: "https://zones-of-fire-3635a-default-rtdb.firebaseio.com",
+            projectId: "zones-of-fire-3635a",
+            storageBucket: "zones-of-fire-3635a.appspot.com",
+            messagingSenderId: "816830382931",
+            appId: "1:816830382931:web:a3410e35b464491f8657a6"
+        };
+        firebase.initializeApp(firebaseConfig);
+    </script>
+
     <script type="module" src="js/script.js"></script>
 </body>
 </html>

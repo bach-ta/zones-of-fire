@@ -1,9 +1,9 @@
-import { MAX_STAMINA } from './constants.js';
+import { INIT_PLAYER_X, INIT_PLAYER_Y, INITIAL_ANGLE, DIRECTION_RIGHT, MAX_STAMINA } from './constants.js';
 import Game from './game.js';
 
 // **********************************************************************
 // Event listeners
-//
+// **********************************************************************
 
 const handleKeyDown = (e, game) => {
     switch (e.keyCode){
@@ -12,7 +12,8 @@ const handleKeyDown = (e, game) => {
             break;   
         case 37:                              // If pressed left arrow (<)
         case 65:                              // If pressed A
-            game.players[game.turn].leftPressed = true;   
+            game.players[game.turn].leftPressed = true;
+            console.log(game.players[game.turn])
             break;
         case 38:                              // If pressed up arrow (^)
         case 87:                              // If pressed W
@@ -64,16 +65,108 @@ const handleKeyUp = (e, game) => {
         }
 }
 
-export const enableEventListener = (game) => {
+const enableEventListener = (game) => {
     document.addEventListener('keydown', (e) => {handleKeyDown(e, game)});
     document.addEventListener('keyup', (e) => {handleKeyUp(e, game)});
 }
 
+// **********************************************************************
+// Generating player name and color
+// **********************************************************************
+function randomFromArray(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+function createName() {
+    const prefix = randomFromArray(["COOL","SUPER","HIP","SMUG","COOL","SILKY",
+                                    "GOOD","SAFE","DEAR","DAMP","WARM","RICH",
+                                    "LONG","DARK","SOFT","BUFF", "DOPE",]);
+    const animal = randomFromArray(["BEAR","DOG","CAT","FOX","LAMB","LION","BOAR","GOAT",
+                                    "VOLE","SEAL","PUMA","MULE","BULL","BIRD","BUG",]);
+    return `${prefix} ${animal}`;
+}
+const playerColors = ["blue", "red", "orange", "yellow", "green", "purple"];
 
-window.onload = () => {
-    let game = new Game();
-    enableEventListener(game);
-    game.loop();
+// **********************************************************************
+// Game
+// **********************************************************************
+const numPlayers = 2;
+
+
+// Database
+let userIdDatabase;
+let userRefDatabase;
+// Local
+let players = {};
+
+// When an user logged in
+firebase.auth().onAuthStateChanged((user) => {
+    if (user){      // TODO: add prevent additional players to join (asking how many players)
+        userIdDatabase = user.uid;
+        userRefDatabase = firebase.database().ref(`players/${userIdDatabase}`);
+        // Create my player in the database
+        userRefDatabase.set({
+            id: userIdDatabase,
+            name: createName(),
+            color: randomFromArray(playerColors),
+            x: INIT_PLAYER_X,
+            y: INIT_PLAYER_Y,
+            leftPressed: false
+        })
+        // Begin the game now that we are signed in
+        initGame();
+        //Remove me from Firebase when diconnect
+        userRefDatabase.onDisconnect().remove();
+    }
+})
+firebase.auth().signInAnonymously().catch((error) => {
+    var errorCode = error.code;
+    var errorMessage = error.message;
+    // ...
+    console.log(errorCode, errorMessage);
+})
+
+function initGame(){
+    const allPlayersDatabaseRef = firebase.database().ref(`players`);
+    
+    // Fires whenever a new node is added the tree
+    allPlayersDatabaseRef.on("child_added", (snapshot) => {
+        //Fires whenever a new node is added the tree
+        const addedPlayer = snapshot.val();
+        players[addedPlayer.id] = addedPlayer;
+        console.log(players)
+        // Allow game to run when numPlayers players joined the game
+        if (Object.keys(players).length === numPlayers){
+            console.log("Enough players joined the game");
+            startGame();
+        }
+    })
+
+    // Remove from screen when logged out
+    allPlayersDatabaseRef.on("child_removed", (snapshot) => {
+        alert("Other player left the game");
+        // TODO: Remove from local players
+    })
+
+    // Fires whenever a change occurs (player joins, leaves, or modification within a player)
+    allPlayersDatabaseRef.on("value", (snapshot) => {
+        // players = snapshot.val() || {};
+        // // Iterate through player object in database-> key = x, y, ...
+        // Object.keys(players).forEach((key) => {
+        //     const characterState = players[key];
+        //     let el = playerElements[key];
+        //     // Now update the local player
+        // })
+        // console.log(players);
+    })
 }
 
-// window.onresize = () => { resizeCanvas(); }
+// --> When we do something, it updates the data on the firebase --> Causes the function with "value" to fire (since value on database changed), that updates game, which draws what we see on screen.
+
+// Have to push the "game" upto server as well, since things like game.turn. or the imagedata, will also needs to be online since they changes everytime.
+
+function startGame(){
+    let game = new Game(numPlayers);
+    enableEventListener(game);
+    game.players = Object.values(players);      // Array of objects, each object = 1 player
+    game.loop();
+}
