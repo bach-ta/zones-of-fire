@@ -1,0 +1,24 @@
+{
+  "name": "zones-of-fire",
+  "version": "1.0.0",
+  "description": "[Zones of Fire](https://zonesoffire.netlify.app/)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bach-ta/zones-of-fire.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bach-ta/zones-of-fire/issues"
+  },
+  "homepage": "https://github.com/bach-ta/zones-of-fire#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "nodemon": "^2.0.19"
+  }
+}
