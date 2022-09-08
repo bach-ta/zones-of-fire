@@ -24,6 +24,17 @@ const { fillRect } = getBoard(canvas);
 
 // fillRect(50, 50, 'green');
 
+class Test{
+    constructor(x,y){
+        this.x = x;
+        this.y = y;
+    }
+    adding = () => {
+        this.x += 10;
+        this.y += 10;
+    }
+}
+
 const sock = io();
 
 // Client sends value to server when an event happens
@@ -34,9 +45,13 @@ document.addEventListener('keydown', (e) => {
 });
 
 function loop(){
-    sock.emit("obj",{x: 100, y: 200});
-    sock.on("obj",(a) => {
-        console.log(a);
+    const player = new Test(2,2);
+    player.adding();
+    // Send
+    sock.emit("player",player);
+    // Receive
+    sock.on("player",(player) => {
+        console.log(player.x);
     })
     window.requestAnimationFrame(loop);
 }

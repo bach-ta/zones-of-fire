@@ -19,7 +19,7 @@ io.on('connection',  (sock) => {
     // sock.on(<event_1>, <value_1> => io.emit(<event_2>, <value_2>))
     
     sock.on('message', (text) => io.emit('message', text));
-    sock.on('obj', (text) => io.emit('obj', text));
+    sock.on('player', (player) => io.emit('obj', player));
 });
 
 server.on('error', (err) => {
@@ -29,4 +29,3 @@ server.on('error', (err) => {
 server.listen(8080, () => {
     console.log('server is ready');
 })
-
