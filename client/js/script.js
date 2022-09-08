@@ -1,5 +1,5 @@
-import { MAX_STAMINA } from './constants.js';
-import Game from './game.js';
+// const { MAX_STAMINA } = require('./constants.js');
+// const { Game } = require('./game.js');
 
 // **********************************************************************
 // Event listeners
@@ -64,16 +64,13 @@ const handleKeyUp = (e, game) => {
         }
 }
 
-export const enableEventListener = (game) => {
+const enableEventListener = (game) => {
     document.addEventListener('keydown', (e) => {handleKeyDown(e, game)});
     document.addEventListener('keyup', (e) => {handleKeyUp(e, game)});
 }
 
-
-window.onload = () => {
-    let game = new Game();
-    enableEventListener(game);
-    game.loop();
-}
-
-// window.onresize = () => { resizeCanvas(); }
+// window.onload = () => {
+//     let game = new Game();
+//     enableEventListener(game);
+//     game.loop();
+// }

@@ -1,11 +1,10 @@
-import { ARROW_LENGTH, ARROW_WIDTH, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, MAX_HEALTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, PLAYER_RADIUS } from "./constants.js";
-import { context } from './constants.js';
+const { context, ARROW_LENGTH, ARROW_WIDTH, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, MAX_HEALTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, PLAYER_RADIUS } = require ("./constants.js");
 
 // **********************************************************************
 // Player Arrow
 // **********************************************************************
 
-export class Arrow{
+class Arrow{
     constructor(angle, color, length = ARROW_LENGTH, width = ARROW_WIDTH){
         this.color = color;
         this.angle = angle;
@@ -27,7 +26,7 @@ export class Arrow{
 // Health Bar
 // **********************************************************************
 
-export class HealthBar {
+class HealthBar {
     constructor(x, y, health = MAX_HEALTH, color){
         this.x = x;
         this.y = y;
@@ -52,7 +51,7 @@ export class HealthBar {
 // Stamina Bar
 // **********************************************************************
 
-export class StaminaBar {
+class StaminaBar {
     constructor(x, y, stamina = MAX_STAMINA, color){
         this.x = x;
         this.y = y;
@@ -77,7 +76,7 @@ export class StaminaBar {
 // Turn Arrow
 // **********************************************************************
 
-export class TurnArrow{
+class TurnArrow{
     constructor(x, y){
         this.x = x;
         this.y = y;
@@ -94,3 +93,5 @@ export class TurnArrow{
         context.fill();
     }
 }
+
+module.exports = { Arrow, HealthBar, StaminaBar, TurnArrow };

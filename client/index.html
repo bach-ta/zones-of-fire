@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zones of Fire</title>
-    <link href="css/style.css" rel="stylesheet">
+    <link href="styles/style.css" rel="stylesheet">
     <link rel="icon" href="./tilesets/Magic Cliffs/Magic-Cliffs-Environment/PREVIEWS/100x100x1.png">
 
 </head>
@@ -14,10 +14,12 @@
         <div id="force-bar"></div>
         <div id="last-force-bar"></div>
     </div>
-    <img id="flying-icon" src="./images/flying.png" style="display:none"></img>
-    <img id="no-flying-icon" src="./images/no-flying.png" style="display:none"></img>
+    <img id="flying-icon" src="./img/flying.png" style="display:none"></img>
+    <img id="no-flying-icon" src="./img/no-flying.png" style="display:none"></img>
     <canvas id="canvas"></canvas>
     <!-- Scripts -->
-    <script type="module" src="js/script.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- <script src="js/script.js"></script> -->
+    <script src="js/client.js"></script>
 </body>
 </html>

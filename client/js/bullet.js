@@ -1,6 +1,6 @@
-import { context } from './constants.js';
+const {context} = require('./constants.js');
 
-export default class Bullet {
+class Bullet {
     constructor(x, y, bulletAngle, velocity, radius, type='damage') {
         //Bullet position
         this.x = x;
@@ -20,3 +20,5 @@ export default class Bullet {
         context.fill();
     }
 }
+
+module.exports = Bullet;

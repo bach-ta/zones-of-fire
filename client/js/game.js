@@ -1,10 +1,9 @@
-import Player, { initPositions } from './player.js';
-import Bullet from './bullet.js';
-import { BACKGROUND, FOREGROUND, canvas, context, MAX_FORCE } from './constants.js';
-import { PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_HEIGHT, STAMINA_BAR_WIDTH, MAX_STAMINA, DAMAGE, INITIAL_ANGLE, SPLASH_RADIUS, CLIMBING_LIMIT } from './constants.js';
-import { HealthBar, StaminaBar, TurnArrow } from './supplementaries.js';
+const { Player, initPositions } = require ('./player.js');
+const { Bullet } = require ('./bullet.js');
+const { canvas, context, BACKGROUND, FOREGROUND, PLAYER_RADIUS, BULLET_RADIUS, ARROW_LENGTH, HEALTH_BAR_HEIGHT, HEALTH_BAR_WIDTH, STAMINA_BAR_WIDTH, SPLASH_RADIUS, MAX_STAMINA, CLIMBING_LIMIT, DIRECTION_RIGHT, DIRECTION_LEFT, GRAVITY, MAX_FORCE, FORCE_STEP, DAMAGE, INITIAL_ANGLE } = require ('./constants.js');
+const { HealthBar, StaminaBar, TurnArrow } = require ('./supplementaries.js');
 
-export default class Game {
+class Game {
   /**********************************************************************
   // Construct the intial states of the game
   // @param {} numPlayers 
@@ -468,3 +467,5 @@ export default class Game {
     document.getElementById('no-flying-icon').style.display='none';
   }
 }
+
+module.exports = { Game };

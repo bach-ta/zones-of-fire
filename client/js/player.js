@@ -1,8 +1,8 @@
-import { Arrow } from './supplementaries.js';
-import { canvas, context, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y, STAMINA_STEP, MAX_FORCE } from './constants.js';
+const { Arrow } = require('./supplementaries.js');
+const { canvas, context, MAX_STAMINA, PLAYER_RADIUS, PLAYER_SPEED, DIRECTION_RIGHT, DIRECTION_LEFT, FORCE_STEP, MAX_HEALTH, MIN_ANGLE, MAX_ANGLE, INIT_PLAYER_X, INIT_PLAYER_Y, STAMINA_STEP, MAX_FORCE } = require('./constants.js');
 
 // Player Objects
-export default class Player{
+class Player{
     
     constructor(x, y, color, angle, direction){
         // Attributes
@@ -128,7 +128,7 @@ export default class Player{
 }
 
 // Initialize player positions
-export const initPositions = () => {
+const initPositions = () => {
     let x1 = INIT_PLAYER_X;
     let y1 = INIT_PLAYER_Y;
     let x2 = canvas.width-INIT_PLAYER_X;
@@ -136,3 +136,5 @@ export const initPositions = () => {
 
     return [x1, y1, x2, y2];
 }
+
+module.exports = { Player, initPositions };
